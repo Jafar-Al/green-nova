@@ -1,0 +1,46 @@
+{
+ "purpose": "Self-contained runtime inputs for `python -m models.suitability.infer --region jo-maan` (full-region and sub-area queries). Too large for the repository (~1.13 GB); NOT needed for models/suitability/examples/run_example.* (uses sample_data).",
+ "location_logical": "<GREEN_NOVA_RUNTIME> (default: <GREEN_NOVA_DATA>/runtime/model1; GREEN_NOVA_DATA names a data folder outside the repository; override the runtime location with env GREEN_NOVA_RUNTIME)",
+ "layout": "<GREEN_NOVA_RUNTIME>/jo-maan/{features.npy,meta.json,region_mask.npy} + regions_jordan_adm1.geojson (copy of regions/jordan_adm1.geojson)",
+ "features_npy": "float32 memmap (47 layers x 2311 rows x 2607 cols) on the 100 m EPSG:6933 grid; layer names in meta.json 'layers'",
+ "total_bytes": 1133465335,
+ "created_utc": "2026-11-23T04:12:08Z",
+ "files": [
+  {
+   "path": "runtime/model1/jo-maan/features.npy",
+   "bytes": 1132658204,
+   "sha256": "03fb153316b2d1186c7df7826ec9988a4574fab25ae6763f20ca17385b625513"
+  },
+  {
+   "path": "runtime/model1/jo-maan/meta.json",
+   "bytes": 1291,
+   "sha256": "2ba81e6549f5e2752f518b9d4cb3ed58d13f0699a819cfa9ac9dbc1e5b2540b2"
+  },
+  {
+   "path": "runtime/model1/jo-maan/region_mask.npy",
+   "bytes": 753226,
+   "sha256": "8cf7cdaa9abe08b27a5361b67eb6a4c9c953fcb1f0a0e84e3331ade91e31365f"
+  },
+  {
+   "path": "runtime/model1/regions_jordan_adm1.geojson",
+   "bytes": 52614,
+   "sha256": "5031f25123f688c5170e81e25b071891e6a5ac537904f38af53e239b320e7e95"
+  }
+ ],
+ "checkpoint": {
+  "file": "models/suitability/checkpoints/model1_suitability_v0.1.pkl (in the repository)",
+  "sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3"
+ },
+ "copy_to_new_machine": "Copy the whole folder, set GREEN_NOVA_RUNTIME to it, verify sha256 of each file above.",
+ "rebuild": {
+  "needs": "the build cache <GREEN_NOVA_DATA>/cache/model1/stack (100 m Jordan layers) which itself needs internet access to Planetary Computer, ISRIC, Geofabrik, ucdavis.edu (hours; see models/suitability/RESUME.md and docs/DATA_SOURCES_model1.md)",
+  "commands": [
+   "python -m models.suitability.regions",
+   "python -m models.suitability.acquire_static dem soilgrids worldclim gsw  (+ tc_ppt tc_pet tc_tmax tc_tmin tc_def tc_aet in parallel, then: acquire_static terraclimate)",
+   "python -m models.suitability.acquire_labels wc ; python -m models.suitability.acquire_labels io",
+   "python -m models.suitability.acquire_vectors sotwis ; python -m models.suitability.acquire_vectors osm",
+   "python -m models.suitability.terrain ; python -m models.suitability.build_stack ; python -m models.suitability.labels",
+   "python -m models.suitability.package_runtime --region jo-maan   (writes the folder described above)"
+  ]
+ }
+}

@@ -1,0 +1,23 @@
+# dependencies and build output (kept outside OneDrive via junctions to C:\GreenNovaData\web)
+/node_modules
+/.next/
+/out/
+/coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# env files: only .env.example is committed
+.env
+.env.*
+!.env.example
+
+# logs / OS
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# local-only dev helpers
+/public/__dev/
+
+# assembled standalone folder
+/release/

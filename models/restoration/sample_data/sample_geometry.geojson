@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","name":"sample-area-maan-plateau","features":[{"type":"Feature","properties":{"note":"small sample area (about 5 km x 5 km) near Ma'an for the Model 2 example; not a Model 1 polygon"},"geometry":{"type":"Polygon","coordinates":[[[35.70,30.20],[35.75,30.20],[35.75,30.25],[35.70,30.25],[35.70,30.20]]]}}]}

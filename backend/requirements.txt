@@ -1,0 +1,26 @@
+# GREEN NOVA AI backend: FastAPI stack only (CPU). Exact versions that passed backend/tests and the real-model smoke test.
+# The models (models/suitability, models/restoration) have their own heavier dependencies (lightgbm, geopandas, pyproj, ...)
+# and must be installed in the same environment for real analysis; see docs/handoff/model1.md and docs/handoff/model2.md.
+fastapi==0.162.5
+starlette==1.7.0
+uvicorn==0.54.0
+pydantic==2.14.4
+pydantic_core==2.50.5
+annotated-types==0.8.0
+typing_extensions==4.16.0
+typing-inspection==0.4.5
+anyio==4.16.0
+h11==0.16.0
+click==8.5.1
+idna==3.20
+colorama==0.4.6
+# raster/vector helpers used by the GeoTIFF clip endpoint and the slim restoration layer
+numpy==2.2.6
+rasterio==1.4.4
+affine==3.0.1
+attrs==26.1.0
+certifi==2026.11.20
+click-plugins==1.1.1.2
+cligj==0.7.2
+pyparsing==3.3.3
+shapely==2.1.2

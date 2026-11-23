@@ -1,0 +1,17 @@
+# Model 2 inference + tests, CPU only (Python 3.10, Windows or Linux). Versions are those used to build and verify the delivered outputs.
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
+scikit-learn==1.7.2
+lightgbm==4.7.0
+rasterio==1.4.4
+geopandas==1.1.4
+shapely==2.1.2
+pyproj==3.7.1
+pyogrio==0.13.0
+affine==3.0.1
+pytest==9.2.0
+# only needed to REBUILD training tables / retrain (not for inference):
+optuna==5.1.0
+joblib==1.6.0
+pyarrow==25.0.1

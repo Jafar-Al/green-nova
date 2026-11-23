@@ -1,0 +1,299 @@
+{
+ "created": "2026-11-23T06:51:51",
+ "model_version": "restoration-0.1.0",
+ "E5_eto_crosscheck": {
+  "n_cells": 4032,
+  "hargreaves_over_penman_monteith": {
+   "mean": 0.8617284297943115,
+   "p5": 0.8196348547935486,
+   "p95": 0.8960060477256775
+  },
+  "pm_annual_mm": {
+   "median": 1931.590087890625,
+   "p5": 1675.111083984375,
+   "p95": 2094.1640625
+  }
+ },
+ "E2_pipeline_consistency_heldout_region": {
+  "n_profiles": 104,
+  "test_region": {
+   "lon": [
+    30.0,
+    50.0
+   ],
+   "lat": [
+    20.0,
+    38.0
+   ]
+  },
+  "note": "climate, ESP, CEC, CF, depth, slope fixed at Ma'an-median/assumed values; only ECe/pH/sand/clay/SOC vary",
+  "observed_state_class_counts": {
+   "not_feasible": 0,
+   "low": 2,
+   "moderate": 2,
+   "high": 100
+  },
+  "predicted_state_class_counts": {
+   "not_feasible": 0,
+   "low": 0,
+   "moderate": 0,
+   "high": 104
+  },
+  "confusion_rows_observed_cols_predicted": [
+   [
+    0,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    2
+   ],
+   [
+    0,
+    0,
+    0,
+    2
+   ],
+   [
+    0,
+    0,
+    0,
+    100
+   ]
+  ],
+  "class_precision": [
+   null,
+   null,
+   null,
+   0.9615384615384616
+  ],
+  "class_recall": [
+   null,
+   0.0,
+   0.0,
+   1.0
+  ],
+  "accuracy": 0.9615384615384616,
+  "within_one_class": 0.9807692307692307,
+  "mean_abs_score_error": 0.07752403616905212,
+  "spearman_score": 0.03633086539945049,
+  "interval_covers_observed_state_score": 0.9423076923076923,
+  "mean_interval_width": 0.25961539149284363,
+  "reliability": [
+   {
+    "bin": [
+     0.8,
+     1.0
+    ],
+    "n": 104,
+    "mean_pred": 0.944411039352417,
+    "mean_obs_state": 0.954026460647583
+   }
+  ],
+  "seconds": 3
+ },
+ "E3_sensitivity": {
+  "n_cells": 20000,
+  "rows": [
+   {
+    "name": "baseline (water 8000 m3/ha/yr)",
+    "mean_score": 0.8772687315940857,
+    "mean_shift": 0.0,
+    "spearman_vs_base": 1.0,
+    "class_flip_rate": 0.0,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.0007,
+     "moderate": 0.0067,
+     "high": 0.99
+    }
+   },
+   {
+    "name": "water allocation 3000 m3/ha/yr",
+    "mean_score": 0.026950782164931297,
+    "mean_shift": -0.8503179550170898,
+    "spearman_vs_base": 0.510016842695747,
+    "class_flip_rate": 0.99475,
+    "class_share": {
+     "not_feasible": 0.9378,
+     "low": 0.03935,
+     "moderate": 0.0202,
+     "high": 0.00265
+    }
+   },
+   {
+    "name": "water allocation 5000 m3/ha/yr",
+    "mean_score": 0.5056132674217224,
+    "mean_shift": -0.3716554641723633,
+    "spearman_vs_base": 0.6432960252905613,
+    "class_flip_rate": 0.79895,
+    "class_share": {
+     "not_feasible": 0.03725,
+     "low": 0.27395,
+     "moderate": 0.49155,
+     "high": 0.19725
+    }
+   },
+   {
+    "name": "water allocation 12000 m3/ha/yr",
+    "mean_score": 0.9068679809570312,
+    "mean_shift": 0.02959921956062317,
+    "spearman_vs_base": 0.9138019380244964,
+    "class_flip_rate": 0.0047,
+    "class_share": {
+     "not_feasible": 0.0025,
+     "low": 0.0007,
+     "moderate": 0.0023,
+     "high": 0.9945
+    }
+   },
+   {
+    "name": "water allocation 20000 m3/ha/yr",
+    "mean_score": 0.9253101348876953,
+    "mean_shift": 0.04804140701889992,
+    "spearman_vs_base": 0.8440436295726707,
+    "class_flip_rate": 0.0057,
+    "class_share": {
+     "not_feasible": 0.0023,
+     "low": 0.0009,
+     "moderate": 0.0015,
+     "high": 0.9953
+    }
+   },
+   {
+    "name": "class cuts -0.1",
+    "mean_score": 0.8772687315940857,
+    "mean_shift": 0.0,
+    "spearman_vs_base": 1.0,
+    "class_flip_rate": 0.00635,
+    "class_share": {
+     "not_feasible": 0.00185,
+     "low": 0.00105,
+     "moderate": 0.0019,
+     "high": 0.9952
+    }
+   },
+   {
+    "name": "class cuts +0.1",
+    "mean_score": 0.8772687315940857,
+    "mean_shift": 0.0,
+    "spearman_vs_base": 1.0,
+    "class_flip_rate": 0.09615,
+    "class_share": {
+     "not_feasible": 0.00275,
+     "low": 0.00095,
+     "moderate": 0.1019,
+     "high": 0.8944
+    }
+   },
+   {
+    "name": "RY success threshold 0.5",
+    "mean_score": 0.8965437412261963,
+    "mean_shift": 0.01927500031888485,
+    "spearman_vs_base": 0.934251273918678,
+    "class_flip_rate": 0.00505,
+    "class_share": {
+     "not_feasible": 0.00245,
+     "low": 0.00075,
+     "moderate": 0.002,
+     "high": 0.9948
+    }
+   },
+   {
+    "name": "RY success threshold 0.7",
+    "mean_score": 0.8220304846763611,
+    "mean_shift": -0.055238280445337296,
+    "spearman_vs_base": 0.8349241752100285,
+    "class_flip_rate": 0.09125,
+    "class_share": {
+     "not_feasible": 0.0028,
+     "low": 0.0027,
+     "moderate": 0.09395,
+     "high": 0.90055
+    }
+   },
+   {
+    "name": "ECe uncertainty x0.5",
+    "mean_score": 0.967507004737854,
+    "mean_shift": 0.09023828059434891,
+    "spearman_vs_base": 0.6836105490902276,
+    "class_flip_rate": 0.0056,
+    "class_share": {
+     "not_feasible": 0.0025,
+     "low": 0.0008,
+     "moderate": 0.0012,
+     "high": 0.9955
+    }
+   },
+   {
+    "name": "ECe central value x2",
+    "mean_score": 0.7748296856880188,
+    "mean_shift": -0.10243906080722809,
+    "spearman_vs_base": 0.841121116202511,
+    "class_flip_rate": 0.14425,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.0009,
+     "moderate": 0.15055,
+     "high": 0.84595
+    }
+   },
+   {
+    "name": "ESP central value x2",
+    "mean_score": 0.857211709022522,
+    "mean_shift": -0.020057031884789467,
+    "spearman_vs_base": 0.9188427555414397,
+    "class_flip_rate": 0.01585,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.00075,
+     "moderate": 0.02245,
+     "high": 0.9742
+    }
+   },
+   {
+    "name": "max leaching depth ratio 0.7 (less water for reclamation)",
+    "mean_score": 0.8571656346321106,
+    "mean_shift": -0.020103124901652336,
+    "spearman_vs_base": 0.9515851499796314,
+    "class_flip_rate": 0.00435,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.00075,
+     "moderate": 0.01065,
+     "high": 0.986
+    }
+   },
+   {
+    "name": "gypsum cap 8 t/ha",
+    "mean_score": 0.8130031228065491,
+    "mean_shift": -0.06426562368869781,
+    "spearman_vs_base": 0.8145665836229886,
+    "class_flip_rate": 0.08555,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.00085,
+     "moderate": 0.09195,
+     "high": 0.9046
+    }
+   },
+   {
+    "name": "ETo +20 %",
+    "mean_score": 0.8179976344108582,
+    "mean_shift": -0.05927109345793724,
+    "spearman_vs_base": 0.8557022661536711,
+    "class_flip_rate": 0.09115,
+    "class_share": {
+     "not_feasible": 0.0026,
+     "low": 0.00125,
+     "moderate": 0.09675,
+     "high": 0.8994
+    }
+   }
+  ]
+ }
+}

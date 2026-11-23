@@ -1,0 +1,100 @@
+{
+  "models": {
+    "ece": {
+      "file": "ece_lgbm.txt",
+      "sha256": "0239b4a2c064db35629cfb54af8882f75d8cc0d265f463e09c5577bc3967762b",
+      "features": [
+        "bio1",
+        "bio4",
+        "bio5",
+        "bio6",
+        "bio12",
+        "bio14",
+        "bio15",
+        "bio17",
+        "bio18",
+        "dm_aridity",
+        "elev",
+        "tpi4",
+        "tpi20",
+        "relief4",
+        "sg_ph",
+        "sg_clay",
+        "sg_sand",
+        "sg_soc"
+      ],
+      "n_rounds": 80,
+      "trained_on_n": 9402,
+      "conformal": {
+        "level": 0.9,
+        "bin_edges": [
+          -0.3642600694711993,
+          -0.15724960516471675,
+          0.022132942649087908
+        ],
+        "half_width_t": [
+          0.8987304688772272,
+          0.8356709313955099,
+          0.9034434814186169,
+          1.0643945780322768
+        ]
+      },
+      "transform": "ece",
+      "lightgbm": "4.7.0"
+    },
+    "esp": {
+      "file": "esp_lgbm.txt",
+      "sha256": "f965557f7ca664ff3a4bbd210425c1fb9ae7a54a0ac2447fc090ea6e8c28106b",
+      "features": [
+        "bio1",
+        "bio4",
+        "bio5",
+        "bio6",
+        "bio12",
+        "bio14",
+        "bio15",
+        "bio17",
+        "bio18",
+        "dm_aridity",
+        "elev",
+        "tpi4",
+        "tpi20",
+        "relief4",
+        "sg_ph",
+        "sg_clay",
+        "sg_sand",
+        "sg_soc"
+      ],
+      "n_rounds": 106,
+      "trained_on_n": 8698,
+      "conformal": {
+        "level": 0.9,
+        "bin_edges": [
+          0.7226372006381232,
+          0.9720254422720886,
+          1.2264871834579403
+        ],
+        "half_width_t": [
+          0.8506259952219203,
+          1.2826541418078314,
+          1.1857758317623335,
+          1.7519295189676054
+        ]
+      },
+      "transform": "esp",
+      "lightgbm": "4.7.0"
+    }
+  },
+  "created": "2026-11-23T00:50:16",
+  "test_box": {
+    "lon": [
+      30.0,
+      50.0
+    ],
+    "lat": [
+      20.0,
+      38.0
+    ]
+  },
+  "domain_dm_max": 30.0
+}

@@ -1,0 +1,15 @@
+# Model 1 inference (CPU only, Python 3.10+). Exact versions used to build and test the shipped checkpoint (Windows, 2026-11-23).
+numpy==2.2.6
+scipy==1.15.3
+rasterio==1.4.4
+shapely==2.1.2
+pyproj==3.7.1
+geopandas==1.1.4
+pyogrio==0.13.0
+pandas==2.3.3
+lightgbm==4.7.0
+pytest==9.2.0
+# Only needed to RETRAIN (python -m models.suitability.train ...): 
+# scikit-learn==1.7.2
+# optuna==5.1.0
+# No torch / GPU is used by Model 1.

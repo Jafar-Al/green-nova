@@ -1,0 +1,38 @@
+# Secrets and local config - NEVER commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.token
+kaggle.json
+credentials*
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Local runtime state, logs, caches, raw data (large; see HANDOFF_REPORT.md for how to rebuild)
+logs/
+*.log
+*.sqlite
+jobs/
+raw/
+cache/
+GreenNovaData/
+GreenNovaRun/
+models/*/outputs_tmp/
+models/*/outputs/*_new/
+models/*/scratch/
+*.zip

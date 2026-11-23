@@ -1,0 +1,33 @@
+{
+ "type": "Feature",
+ "properties": {
+  "name": "sample AOI near Shobak (illustrative)"
+ },
+ "geometry": {
+  "type": "Polygon",
+  "coordinates": [
+   [
+    [
+     35.5,
+     30.45
+    ],
+    [
+     35.59,
+     30.45
+    ],
+    [
+     35.59,
+     30.51
+    ],
+    [
+     35.5,
+     30.51
+    ],
+    [
+     35.5,
+     30.45
+    ]
+   ]
+  ]
+ }
+}

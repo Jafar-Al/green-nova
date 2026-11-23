@@ -1,0 +1,33 @@
+{
+  "model_version": "restoration-0.1.0",
+  "inference_requires_only_these_repo_files": [
+    {"path": "models/restoration/runtime_data/jo-maan/stack.npz", "size_mb": 19.8, "note": "250 m region stack + native-grid climate; built by build_runtime"},
+    {"path": "models/restoration/checkpoints/ece_lgbm.txt", "sha256": "0239b4a2c064db35629cfb54af8882f75d8cc0d265f463e09c5577bc3967762b"},
+    {"path": "models/restoration/checkpoints/esp_lgbm.txt", "sha256": "f965557f7ca664ff3a4bbd210425c1fb9ae7a54a0ac2447fc090ea6e8c28106b"},
+    {"path": "models/restoration/checkpoints/soil_models_meta.json"},
+    {"path": "models/suitability/outputs/jo-maan/", "note": "Model 1 polygons.geojson + suitability.tif (current-class input; if absent a documented stand-in map is used)"}
+  ],
+  "not_in_repo_needed_only_to_retrain_or_rebuild_stack": [
+    {"what": "WoSIS 2023-12 snapshot (zip 456 MB, extracted TSVs ~2.2 GB)", "where": "$GREEN_NOVA_DATA/raw/wosis", "source": "https://files.isric.org/public/wosis_snapshot/WoSIS_2023_December.zip",
+     "sha256": "3115c6be84613dc960c600768a9999dd6d6ad5207017065196b7e356d3c50f3a", "rebuild": "download + unzip, then: python -m models.restoration.data.wosis"},
+    {"what": "Hassani et al. 2020 measured ECe/ESP point shapefiles (zips 2.6 MB + 9.6 MB, extracted ~160 MB)", "where": "$GREEN_NOVA_DATA/raw/hassani2020_salinity", "source": "https://data.mendeley.com/datasets/v9mgbmtnf2/1 (CC BY 4.0)",
+     "rebuild": "download ECe_input_training_data.zip and ESP_input_training_data.zip, unzip to ece_train/ and esp_train/"},
+    {"what": "Global feature layers: SoilGrids 1 km (phh2o, clay, sand, soc; 5-15 cm mean; ~0.68 GB), WorldClim 2.1 5-arcmin bioclim zip (180 MB), WorldClim 30-arcsec elevation zip (338 MB); total ~1.6 GB", "where": "$GREEN_NOVA_DATA/cache/model2/global",
+     "source": "https://files.isric.org/soilgrids/latest/data_aggregated/1000m/<prop>/<prop>_5-15cm_mean_1000.tif ; https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_5m_bio.zip and wc2.1_30s_elev.zip",
+     "rebuild": "download, then: python -m models.restoration.data.salinity_points"},
+    {"what": "Shared covariate cache written by model1 (SoilGrids 250 m, Copernicus DEM, TerraClimate raw 2011-2020), ~1.1 GB", "where": "$GREEN_NOVA_DATA/cache/covariates", "rebuild": "python -m models.suitability.acquire_static dem soilgrids terraclimate (network)"},
+    {"what": "TerraClimate region npz built from the shared cache", "where": "$GREEN_NOVA_DATA/cache/model2/tc_jo-maan.npz", "rebuild": "python -m models.restoration.data.climate_from_cache"}
+  ],
+  "rebuild_order": [
+    "python -m models.restoration.data.wosis",
+    "python -m models.restoration.data.salinity_points",
+    "python -m models.restoration.soilml            # trains + writes checkpoints and eval/soil_models_report.json",
+    "python -m models.restoration.eval.soilgrids_check",
+    "python -m models.restoration.data.climate_from_cache",
+    "python -m models.restoration.build_runtime --region jo-maan",
+    "python -m models.restoration.infer --region jo-maan --suitability-dir models/suitability/outputs/jo-maan --out models/restoration/outputs/jo-maan_new",
+    "python -m models.restoration.eval.evaluate"
+  ],
+  "env": "GREEN_NOVA_DATA = data root of the machine that rebuilds the model (machine-specific); inference does not read it",
+  "validation_status": "see docs/EVAL_model2.md section 6 (pending items listed: observed-analog check, AfSIS domain shift, Hassani map benchmark, 30-yr climate, real-outcome calibration impossible)"
+}

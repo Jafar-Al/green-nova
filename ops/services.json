@@ -1,0 +1,51 @@
+{
+  "runRoot": "C:\\GreenNovaRun",
+  "dataRoot": "C:\\GreenNovaData",
+  "domain": "greennova.dosteam.org",
+  "dependencyWaitSec": 180,
+  "services": [
+    {
+      "name": "backend",
+      "exe": "${DATA}\\venv\\Scripts\\python.exe",
+      "args": ["-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "1", "--no-server-header"],
+      "cwd": "${RUN}\\app",
+      "port": 8000,
+      "match": "uvicorn",
+      "health": "http://127.0.0.1:8000/health",
+      "ready": "http://127.0.0.1:8000/ready",
+      "dependsOn": [],
+      "graceSec": 120,
+      "healthIntervalSec": 30,
+      "failThreshold": 4,
+      "env": {
+        "GREEN_NOVA_DATA": "${DATA}",
+        "GREEN_NOVA_RUNTIME": "${DATA}\\runtime",
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    {
+      "name": "frontend",
+      "exe": "C:\\Program Files\\nodejs\\node.exe",
+      "args": ["${RUN}\\web\\server.js"],
+      "cwd": "${RUN}\\web",
+      "port": 3000,
+      "match": "GreenNovaRun\\web\\server.js",
+      "health": "http://127.0.0.1:3000/",
+      "ready": "",
+      "dependsOn": ["backend"],
+      "graceSec": 30,
+      "healthIntervalSec": 30,
+      "failThreshold": 4,
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "3000",
+        "HOSTNAME": "0.0.0.0",
+        "BACKEND_URL": "http://127.0.0.1:8000",
+        "GREEN_NOVA_DOMAIN": "greennova.dosteam.org",
+        "NEXT_PUBLIC_SITE_URL": "https://greennova.dosteam.org",
+        "NEXT_TELEMETRY_DISABLED": "1"
+      }
+    }
+  ]
+}
