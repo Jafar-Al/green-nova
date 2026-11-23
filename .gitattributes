@@ -7,3 +7,8 @@
 *.jpg binary
 *.png binary
 *.webp binary
+# Hash-verified artifacts must keep their EXACT bytes (no line-ending conversion on checkout), otherwise the
+# sha256 checks in the model examples fail on Windows.
+models/*/checkpoints/** -text
+models/*/runtime_data/** -text
+models/*/sample_data/** -text
