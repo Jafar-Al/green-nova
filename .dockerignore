@@ -1,15 +1,18 @@
+# Build context of the backend image (repository root). The web image uses web/ as its own context (web/.dockerignore).
 .git
-graphify-out
 .venv
-**/node_modules
-**/.next
-**/__pycache__
-**/.pytest_cache
 .env
 .env.*
 !.env.example
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+web
 docs
 scripts
-models/*/sample_data
-models/*/examples
+tests
+backend/tests
 models/*/tests
+models/*/examples
+models/*/sample_data
+models/*/eval

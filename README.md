@@ -70,7 +70,11 @@ powershell -ExecutionPolicy Bypass -File scripts\run_tests.ps1
 Python (`backend/tests`, `models/*/tests`, `tests/` for the 12-governorate integrity checks) and web (`npm run typecheck`, `npm run lint`, `npm test`). `web/scripts/smoke.ps1` is an end-to-end check against a running stack.
 
 ## Deployment
-The project has no dependency on any particular host, domain or tunnel. See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for running behind your own reverse proxy and for container files.
+The project has no dependency on any particular host, domain or tunnel. With Docker (Compose v2.20+), after cloning:
+```bash
+docker compose up --build --wait     # then open http://localhost:3000
+```
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the container design, health checks, persistence and running behind your own reverse proxy.
 
 ## Data, licences and attribution
 Raw datasets are not in the repository. Sources, versions, licences and rebuild steps: [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md), [`docs/DATA_SOURCES_model1.md`](docs/DATA_SOURCES_model1.md), [`docs/DATA_SOURCES_model2.md`](docs/DATA_SOURCES_model2.md).

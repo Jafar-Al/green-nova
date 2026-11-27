@@ -1,14 +1,35 @@
-# Backend image (FastAPI + both models, CPU only). Build from the repository root: docker build -f deploy/Dockerfile.backend .
-FROM python:3.11-slim
-RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+# syntax=docker/dockerfile:1
+# Backend image: FastAPI + both models (CPU only). Build from the repository root:
+#   docker build -f deploy/Dockerfile.backend -t green-nova-backend .
+# The image carries the code, the committed model checkpoints, the per-governorate runtime stacks and the precomputed outputs (about 200 MB of data);
+# raw datasets are never part of the image. Mutable state (job database, job results, logs) lives in the /data volume.
+ARG PYTHON_VERSION=3.11
+
+FROM python:${PYTHON_VERSION}-slim AS deps
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /w
+COPY requirements-runtime.txt .
+RUN python -m venv /opt/venv && /opt/venv/bin/pip install -r requirements-runtime.txt
+
+FROM python:${PYTHON_VERSION}-slim AS runtime
+# libgomp1: OpenMP runtime needed by LightGBM; libexpat1: needed by the GDAL build bundled in the rasterio wheel
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 libexpat1 \
+ && rm -rf /var/lib/apt/lists/* \
+ && useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin gn \
+ && mkdir -p /data && chown gn:gn /data
+COPY --from=deps /opt/venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH \
+    GREEN_NOVA_APP_ROOT=/app GREEN_NOVA_DATA=/data HOME=/tmp \
+    PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 CUDA_VISIBLE_DEVICES=
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY regions regions
 COPY backend backend
 COPY models models
-COPY regions regions
-ENV GREEN_NOVA_APP_ROOT=/app GREEN_NOVA_DATA=/data PYTHONUNBUFFERED=1 CUDA_VISIBLE_DEVICES=
+USER gn
 VOLUME /data
-# Loopback only: the web container shares this network namespace (see docker-compose.yml); the port is never published.
+# Loopback only: the web container shares this network namespace (docker-compose.yml) and the port is never published directly.
 EXPOSE 8000
+# "healthy" means /ready reports status "ready": the Python libraries import and every governorate has its model files.
+HEALTHCHECK --interval=15s --timeout=8s --start-period=45s --retries=4 \
+  CMD ["python", "-c", "import json,sys,urllib.request; r=json.load(urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=6)); sys.exit(0 if r.get('status')=='ready' else 1)"]
 CMD ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000", "--workers", "1", "--no-server-header"]

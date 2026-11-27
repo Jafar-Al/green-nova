@@ -1,0 +1,17 @@
+# GREEN NOVA AI - Python runtime packages (CPU only): the FastAPI backend and both models' inference.
+# This is the list installed in the backend container image (deploy/Dockerfile.backend). requirements.txt adds the test tools.
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
+scikit-learn==1.7.2
+joblib==1.6.0
+lightgbm==4.7.0
+rasterio==1.4.4
+geopandas==1.1.4
+pyogrio==0.13.0
+shapely==2.1.2
+pyproj==3.7.1
+fastapi==0.162.5
+starlette==1.7.0
+pydantic==2.14.4
+uvicorn==0.54.0

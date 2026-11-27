@@ -12,3 +12,10 @@
 models/*/checkpoints/** -text
 models/*/runtime_data/** -text
 models/*/sample_data/** -text
+
+# container build inputs keep LF line endings on every platform
+.dockerignore text eol=lf
+**/.dockerignore text eol=lf
+deploy/Dockerfile.* text eol=lf
+docker-compose.yml text eol=lf
+requirements*.txt text eol=lf

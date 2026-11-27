@@ -1,26 +1,55 @@
-# docker compose up --build   ->  http://localhost:3000
-# The web container joins the backend container's network namespace, so the backend stays on 127.0.0.1:8000 (never published)
-# and the web server's loopback-only BACKEND_URL rule is satisfied. Only port 3000 is published (declared on the backend service
-# because the two containers share one network stack).
+# Run the whole application:   docker compose up --build --wait        then open  http://localhost:3000
+# Optional settings go in a .env file next to this one (see .env.example, "Docker Compose" section); every value has a default.
+#
+# Topology: the backend container joins the WEB container's network namespace. The backend therefore listens on 127.0.0.1:8000 inside that
+# namespace (never published; the web server only talks to loopback) and only the web port is published. The web container owns the namespace
+# because it is the stable one: if the backend crashes and is restarted it re-joins the same namespace and the web server reconnects by itself.
+# The web container is healthy only when the backend behind it answers, so `--wait` returns when the whole application is ready.
+name: green-nova
+
+x-hardening: &hardening
+  init: true
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
+  web:
+    <<: *hardening
+    build:
+      context: web
+      dockerfile: ../deploy/Dockerfile.web
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    image: green-nova-web:local
+    ports:
+      - "${GREEN_NOVA_PORT:-3000}:3000"
+    # healthcheck comes from the image: it calls the web proxy, which calls the backend
+
   backend:
+    <<: *hardening
     build:
       context: .
       dockerfile: deploy/Dockerfile.backend
-    ports:
-      - "3000:3000"
+    image: green-nova-backend:local
+    network_mode: "service:web"
+    depends_on:
+      web:
+        condition: service_started
+        restart: true
+    environment:
+      GN_MIN_FREE_MB: ${GN_MIN_FREE_MB:-1500}
+      GN_JOB_RATE_PER_HOUR: ${GN_JOB_RATE_PER_HOUR:-30}
+      GN_MAX_QUEUE: ${GN_MAX_QUEUE:-6}
     volumes:
       - green-nova-data:/data
-    restart: unless-stopped
-  web:
-    build:
-      context: .
-      dockerfile: deploy/Dockerfile.web
-      args:
-        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-    network_mode: "service:backend"
-    depends_on:
-      - backend
-    restart: unless-stopped
+    mem_limit: ${GN_BACKEND_MEM_LIMIT:-6g}
+    # healthcheck comes from the image: it calls /ready, which fails when libraries, models or governorate files are missing
+
 volumes:
   green-nova-data:

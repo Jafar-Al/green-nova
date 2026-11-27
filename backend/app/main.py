@@ -6,6 +6,7 @@ No /docs, /redoc or /openapi.json. No CORS (same-origin only: browsers never rea
 """
 from __future__ import annotations
 
+import importlib
 import logging
 import sys
 import time
@@ -97,6 +98,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             st.db.ping()
         except Exception:  # noqa: BLE001
             problems.append("job store")
+        # the geospatial/ML libraries the models need must actually import (a missing system library only shows up at import time)
+        for mod in ("rasterio", "geopandas", "shapely", "lightgbm", "sklearn"):
+            try:
+                importlib.import_module(mod)
+            except Exception:  # noqa: BLE001
+                problems.append(f"python package {mod}")
         regs = load_regions(st.settings.regions_file)
         if not regs:
             problems.append("region boundaries")
