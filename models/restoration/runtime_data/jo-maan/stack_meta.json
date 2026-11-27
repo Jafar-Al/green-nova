@@ -1,6 +1,6 @@
 {
  "region": "jo-maan",
- "built": "2026-11-23T06:41:32",
+ "built": "2026-11-27T17:24:41",
  "model_version": "restoration-0.1.0",
  "layers": {
   "slope_deg": "Copernicus GLO-30 -> 50 m slope -> 250 m mean (observed)",
@@ -16,7 +16,7 @@
   "ece": "own LightGBM (ece) on 1 km features, replicated to 250 m grid (effective resolution 1 km; ml_predicted)",
   "esp": "own LightGBM (esp) on 1 km features, replicated to 250 m grid (effective resolution 1 km; ml_predicted)"
  },
- "climate": "TerraClimate 1991-2020 monthly climatology (ppt, pet = FAO-56 PM ETo), annual rainfall series for design rainfall (33rd percentile), native ~4 km",
+ "climate": "TerraClimate 2011-2020 monthly climatology (ppt, pet = FAO-56 PM ETo), annual rainfall series for design rainfall (33rd percentile), native ~4 km",
  "effective_resolution_m": {
   "soil_ph_soc_texture": 250,
   "salinity_sodicity": 1000,

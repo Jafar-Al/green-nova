@@ -74,7 +74,9 @@ SCENARIOS = {
 SCEN_IDS = list(SCENARIOS)
 
 # parameter priors (assumed unless a source is named)
-def sample_params(J: int, rng: np.random.Generator, water_cap: float = 8000.0) -> dict:
+def sample_params(J: int, rng: np.random.Generator, water_cap: float | None = None) -> dict:
+    """water_cap=None (default): irrigation supply per unit is the local renewable water (Units.wsup, geographic). A number switches to the legacy
+    uniform 'reference allocation' scenario condition (kept only for sensitivity tests)."""
     tri = lambda lo, mode, hi: rng.triangular(lo, mode, hi, J)
     return dict(
         tol_f=np.exp(rng.normal(0, 0.20, J)),                 # crop salinity tolerance scale (assumed +-20 %, olive proxy handled separately)
@@ -88,7 +90,7 @@ def sample_params(J: int, rng: np.random.Generator, water_cap: float = 8000.0) -
         gyp_eff=rng.uniform(0.5, 0.9, J),                     # fraction of applied gypsum Ca effective in replacing Na (assumed)
         gyp_cap=rng.uniform(15.0, 40.0, J),                   # max practical gypsum rate t/ha (assumed)
         dsoc=tri(0.05, 0.15, 0.40),                           # SOC gain (%, 0-30 cm) over ~5 yr from amendments (assumed; GRAVUER_2019 qualitative only)
-        wcap=np.exp(rng.normal(np.log(water_cap), 0.15, J)),  # reference water allocation m3/ha/yr per unit: a SCENARIO CONDITION (default 8000, assumed), not an observation
+        wcap=(lambda z: None if water_cap is None else np.exp(z))(rng.normal(np.log(water_cap or 8000.0), 0.15, J)),  # legacy uniform allocation (only when water_cap is given)
         ccr_max=rng.uniform(6.0, 12.0, J),                    # max catchment:cultivated ratio (FAO_WH91 example 7.2:1 'high'; assumed range)
         k_runoff=tri(0.10, 0.25, 0.50),                       # FAO_WH91: 0.1-0.5
         eff_wh=rng.uniform(0.50, 0.75, J),                    # FAO_WH91: 0.5-0.75
@@ -97,6 +99,7 @@ def sample_params(J: int, rng: np.random.Generator, water_cap: float = 8000.0) -
         ecw_u=rng.uniform(0, 1, J),                           # position within each water source's ECw triangular prior
         lr_cap=rng.uniform(0.35, 0.5, J),
         ece_target_yp=rng.choice([0.9, 1.0], J, p=[0.7, 0.3]),
+        wz=rng.standard_normal(J),                            # standard-normal draw scaling the year-to-year spread of local renewable water (drawn last: other parameters keep their streams)
     )
 
 
@@ -123,6 +126,8 @@ class Units:
     tmin_cold: np.ndarray                         # degC mean Tmin coldest month
     salt_flat: np.ndarray                         # bool: playa/sabkha-type (very high ECe + flat)
     restricted: np.ndarray                        # bool: Model 1 class 5
+    wsup: np.ndarray | None = None                # m3/ha/yr locally generated RENEWABLE water (climatic surplus P - AET, TerraClimate 2011-2020 mean)
+    wsup_sd: np.ndarray | None = None             # m3/ha/yr year-to-year standard deviation of that surplus (used as uncertainty)
     n: int = field(init=False)
 
     def __post_init__(self):
@@ -133,7 +138,7 @@ class Units:
         for k, v in self.__dict__.items():
             if k == "n":
                 continue
-            d[k] = v[..., idx] if (isinstance(v, np.ndarray) and v.ndim == 2) else v[idx]
+            d[k] = None if v is None else (v[..., idx] if (isinstance(v, np.ndarray) and v.ndim == 2) else v[idx])
         return Units(**d)
 
 
@@ -187,7 +192,7 @@ def _ece_target(crop, yp, tol_f):
 
 
 def evaluate(U: Units, J: int = 16, I: int = 4, seed: int = RNG_SEED, chunk: int = 5000, return_draws: bool = False, params: dict | None = None,
-             progress=None, water_cap: float = 8000.0) -> dict:
+             progress=None, water_cap: float | None = None) -> dict:
     """Run the nested Monte-Carlo for all units. Returns per-unit arrays (see keys below)."""
     rng = np.random.default_rng(seed)
     P = params if params is not None else sample_params(J, rng, water_cap)
@@ -302,7 +307,14 @@ def _eval_chunk(U: Units, P: dict, J: int, I: int, rng) -> dict:
                 gyp = applied
                 soc = soc + col(P["dsoc"])
                 demand_m3 = gross_mm * 10.0 + recl_mm * 10.0 / 5.0            # one-off reclamation water amortised over 5 yr (assumed)
-                frac = np.minimum(1.0, col(P["wcap"]) / np.maximum(demand_m3, 1.0))
+                # water SUPPLIED to this unit: its own locally generated renewable water (geographic, uncertain), not a universal allocation
+                if P.get("wcap") is not None:
+                    supply = col(P["wcap"])
+                elif U.wsup is not None:
+                    supply = np.maximum(U.wsup[None, None, :] + col(P["wz"]) * U.wsup_sd[None, None, :], 0.0)
+                else:
+                    raise ValueError("no water supply for the irrigated scenarios: provide Units.wsup (local renewable water) or water_cap")
+                frac = np.minimum(1.0, supply / np.maximum(demand_m3, 1.0))
                 w_here = np.broadcast_to(demand_m3, (J, I, n)).astype("float32")
             else:                                                                                # rainfed + water harvesting
                 kmin = hydro.wh_catchment_ratio(wr, dr, col(P["k_runoff"]), col(P["eff_wh"]))

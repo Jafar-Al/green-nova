@@ -1,6 +1,6 @@
 {
  "region": "jo-mafraq",
- "built": "2026-11-27T16:34:41",
+ "built": "2026-11-27T17:19:39",
  "model_version": "restoration-0.1.0",
  "layers": {
   "slope_deg": "Copernicus GLO-30 -> 50 m slope -> 250 m mean (observed)",

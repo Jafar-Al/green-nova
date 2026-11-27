@@ -178,11 +178,23 @@ def build_properties(U: engine.Units, E: dict, i: int, ctx: dict, feas_cuts: dic
             post_class_probabilities={str(k + 1): _r(p, 3) for k, p in enumerate(probs)},
             success_probability=_r(float(E["scen_p"][s, i]), 3),
             water_requirement_m3_ha_yr=dict(low=_r(float(E["scen_w_lo"][s, i]), 0), central=_r(float(E["scen_w_mid"][s, i]), 0), high=_r(float(E["scen_w_hi"][s, i]), 0)),
+            local_renewable_water_m3_ha_yr=(None if U.wsup is None else _r(float(U.wsup[i]), 0)),
+            water_deficit_m3_ha_yr=(None if U.wsup is None else _r(max(float(E["scen_w_mid"][s, i]) - float(U.wsup[i]), 0.0), 0)),
             reclamation_water_m3_ha_one_off=_r(float(E["scen_reclaim_m3"][s, i]), 0), gypsum_t_ha=_r(float(E["scen_gypsum_t"][s, i]), 1),
             water_sources=[sc["source"]], infrastructure=list(sc["infrastructure"]), crop_categories=cats, viable_crops=crops_ok,
             time_to_effect_years=dict(low=_r(t_lo, 1), high=_r(t_hi, 1)), residual_risks=residual_risks(U, E, i, sid), evidence="simulated"))
     best_sid = sids[keep[0]]
     top_ints = interventions_for(U, E, i, [sids[s] for s in keep[:2]], lfs)
+    # water required vs available for the cheapest IRRIGATED route, reported for every unit (also for units whose retained scenario is rain-fed or that are not feasible)
+    irrigation = None
+    if U.wsup is not None:
+        need = [(float(E["scen_w_mid"][s, i]), s) for s, sid in enumerate(sids) if SCEN[sid]["irrigated"] and float(E["scen_w_mid"][s, i]) > 0.0]
+        if need:
+            n_, s_ = min(need)
+            sup = float(U.wsup[i])
+            irrigation = dict(scenario=sids[s_], central_requirement_m3_ha_yr=_r(n_, 0), local_renewable_supply_m3_ha_yr=_r(sup, 0),
+                              deficit_m3_ha_yr=_r(max(n_ - sup, 0.0), 0), surplus_m3_ha_yr=_r(max(sup - n_, 0.0), 0), share_of_need_met_locally=_r(min(1.0, sup / n_), 3),
+                              basis="lowest central net irrigation requirement among the irrigated scenarios (best-scoring crop of each), compared with local renewable water")
     return dict(
         current_class_code=int(ctx.get("current_class", 4)[i]) if hasattr(ctx.get("current_class", 4), "__len__") else int(ctx.get("current_class", 4)),
         limiting_factors=lfs,
@@ -190,8 +202,13 @@ def build_properties(U: engine.Units, E: dict, i: int, ctx: dict, feas_cuts: dic
         feasibility_meta=dict(
             confidence_method="1 - width of the 5-95 % interval of the Monte-Carlo success probability over parameter draws (NOT a calibrated probability of real-world success)",
             score_definition=("probability, over input-uncertainty x parameter draws, that at least one evaluated scenario brings the best crop to relative yield >= 0.6 (FAO class S2 or better)"
-                              f" under a reference water allocation of {int(water_cap)} m3/ha/yr per unit (a scenario condition, not an observation)"),
+                              + (f" under a uniform what-if water allocation of {int(water_cap)} m3/ha/yr per unit (not an observation)" if water_cap is not None else
+                                 " when irrigation can use only the renewable water generated locally (climatic surplus P - AET, ~4 km); external water (transfers, fossil groundwater, wastewater) is NOT assumed or mapped")),
             evidence="simulated", best_scenario=best_sid),
+        water=dict(local_renewable_supply_m3_ha_yr=(None if U.wsup is None else dict(central=_r(float(U.wsup[i]), 0), year_to_year_sd=_r(float(U.wsup_sd[i]), 0))),
+                   basis="TerraClimate 2011-2020 mean annual climatic water surplus (P - AET) at ~4 km, 1 mm = 10 m3/ha; an upper bound on renewable water generated at this location (runoff + recharge), before any capture losses",
+                   irrigation=irrigation,
+                   evidence="observed climate -> simulated supply", not_mapped="groundwater storage and abstraction limits, fossil aquifers, national water transfers, treated wastewater, dams and canals"),
         interventions=top_ints, scenarios=scen_out)
 
 

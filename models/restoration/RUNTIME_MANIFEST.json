@@ -15,7 +15,7 @@
     {"what": "Global feature layers: SoilGrids 1 km (phh2o, clay, sand, soc; 5-15 cm mean; ~0.68 GB), WorldClim 2.1 5-arcmin bioclim zip (180 MB), WorldClim 30-arcsec elevation zip (338 MB); total ~1.6 GB", "where": "$GREEN_NOVA_DATA/cache/model2/global",
      "source": "https://files.isric.org/soilgrids/latest/data_aggregated/1000m/<prop>/<prop>_5-15cm_mean_1000.tif ; https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_5m_bio.zip and wc2.1_30s_elev.zip",
      "rebuild": "download, then: python -m models.restoration.data.salinity_points"},
-    {"what": "Shared covariate cache written by model1 (SoilGrids 250 m, Copernicus DEM, TerraClimate raw 2011-2020), ~1.1 GB", "where": "$GREEN_NOVA_DATA/cache/covariates", "rebuild": "python -m models.suitability.acquire_static dem soilgrids terraclimate (network)"},
+    {"what": "Shared covariate cache written by model1 (SoilGrids 250 m, Copernicus DEM, TerraClimate raw 2011-2020 incl. aet), ~1.1 GB", "where": "$GREEN_NOVA_DATA/cache/covariates", "rebuild": "python -m models.suitability.acquire_static dem soilgrids terraclimate (network)"},
     {"what": "TerraClimate region npz built from the shared cache", "where": "$GREEN_NOVA_DATA/cache/model2/tc_jo-maan.npz", "rebuild": "python -m models.restoration.data.climate_from_cache"}
   ],
   "rebuild_order": [

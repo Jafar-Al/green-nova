@@ -6,39 +6,41 @@ Areas are hectares (1 dunum = 0.1 ha = 1,000 m2) measured on an equal-area grid 
 
 ## Land classes and reclamation feasibility
 
-| Governorate | Area (km2) | Suitable now: classes 1-2 (ha) | Requires reclamation: class 3 (ha) | Currently unsuitable: class 4 (ha) | Excluded: class 5 (ha) | Not suitable now: classes 3+4 (ha) | Reclamation feasibility of classes 3+4 if water is supplied: high / moderate / low (% of that land) |
+| Governorate | Area (km2) | Suitable now: classes 1-2 (ha) | Requires reclamation: class 3 (ha) | Currently unsuitable: class 4 (ha) | Excluded: class 5 (ha) | Not suitable now: classes 3+4 (ha) | Reclamation feasibility of classes 3+4 using only local renewable water: high / moderate / low / not feasible with local resources (% of that land) |
 |---|---:|---:|---:|---:|---:|---:|---|
-| Ajloun | 383 | 2,987 (7.8 %) | 14,068 (36.7 %) | 17,012 (44.4 %) | 4,215 (11.0 %) | 31,080 | 100.0 / 0.0 / 0.0 |
-| Amman | 8,090 | 254,767 (31.5 %) | 268,525 (33.2 %) | 242,492 (30.0 %) | 43,199 (5.3 %) | 511,017 | 100.0 / 0.0 / 0.0 |
-| Aqaba | 6,262 | 712 (0.1 %) | 2,377 (0.4 %) | 598,081 (95.5 %) | 25,065 (4.0 %) | 600,458 | 100.0 / 0.0 / 0.0 |
-| Balqa | 1,096 | 29,444 (26.9 %) | 31,393 (28.6 %) | 30,280 (27.6 %) | 18,466 (16.9 %) | 61,673 | 100.0 / 0.0 / 0.0 |
-| Irbid | 1,823 | 77,500 (42.5 %) | 25,807 (14.2 %) | 42,248 (23.2 %) | 36,710 (20.1 %) | 68,055 | 100.0 / 0.0 / 0.0 |
-| Jerash | 372 | 3,565 (9.6 %) | 14,409 (38.7 %) | 13,340 (35.8 %) | 5,900 (15.9 %) | 27,749 | 100.0 / 0.0 / 0.0 |
-| Karak | 3,488 | 115,074 (33.0 %) | 88,323 (25.3 %) | 91,574 (26.3 %) | 53,879 (15.4 %) | 179,897 | 100.0 / 0.0 / 0.0 |
-| Ma'an | 33,587 | 35,449 (1.1 %) | 492,750 (14.7 %) | 2,780,524 (82.8 %) | 50,006 (1.5 %) | 3,273,274 | 100.0 / 0.0 / 0.0 |
-| Madaba | 1,208 | 21,138 (17.5 %) | 21,284 (17.6 %) | 34,036 (28.2 %) | 44,341 (36.7 %) | 55,320 | 99.7 / 0.3 / 0.0 |
-| Mafraq | 26,631 | 114,008 (4.3 %) | 771,995 (29.0 %) | 1,655,395 (62.2 %) | 121,747 (4.6 %) | 2,427,390 | 100.0 / 0.0 / 0.0 |
-| Tafilah | 2,152 | 27,987 (13.0 %) | 76,308 (35.5 %) | 76,869 (35.7 %) | 34,070 (15.8 %) | 153,177 | 99.5 / 0.5 / 0.0 |
-| Zarqa | 4,318 | 20,206 (4.7 %) | 81,813 (18.9 %) | 272,633 (63.1 %) | 57,130 (13.2 %) | 354,446 | 100.0 / 0.0 / 0.0 |
+| Ajloun | 383 | 2,987 (7.8 %) | 14,068 (36.7 %) | 17,012 (44.4 %) | 4,215 (11.0 %) | 31,080 | 0.0 / 0.1 / 0.2 / 99.7 |
+| Amman | 8,090 | 254,767 (31.5 %) | 268,525 (33.2 %) | 242,492 (30.0 %) | 43,199 (5.3 %) | 511,017 | 0.0 / 0.5 / 46.8 / 52.7 |
+| Aqaba | 6,262 | 712 (0.1 %) | 2,377 (0.4 %) | 598,081 (95.5 %) | 25,065 (4.0 %) | 600,458 | 0.0 / 0.0 / 0.0 / 100.0 |
+| Balqa | 1,096 | 29,444 (26.9 %) | 31,393 (28.6 %) | 30,280 (27.6 %) | 18,466 (16.9 %) | 61,673 | 0.0 / 0.1 / 3.7 / 96.2 |
+| Irbid | 1,823 | 77,500 (42.5 %) | 25,807 (14.2 %) | 42,248 (23.2 %) | 36,710 (20.1 %) | 68,055 | 0.9 / 1.4 / 3.4 / 94.3 |
+| Jerash | 372 | 3,565 (9.6 %) | 14,409 (38.7 %) | 13,340 (35.8 %) | 5,900 (15.9 %) | 27,749 | 0.2 / 0.2 / 0.1 / 99.5 |
+| Karak | 3,488 | 115,074 (33.0 %) | 88,323 (25.3 %) | 91,574 (26.3 %) | 53,879 (15.4 %) | 179,897 | 17.4 / 14.1 / 1.2 / 67.3 |
+| Ma'an | 33,587 | 35,449 (1.1 %) | 492,750 (14.7 %) | 2,780,524 (82.8 %) | 50,006 (1.5 %) | 3,273,274 | 0.0 / 0.0 / 0.0 / 100.0 |
+| Madaba | 1,208 | 21,138 (17.5 %) | 21,284 (17.6 %) | 34,036 (28.2 %) | 44,341 (36.7 %) | 55,320 | 0.0 / 0.3 / 0.3 / 99.4 |
+| Mafraq | 26,631 | 114,008 (4.3 %) | 771,995 (29.0 %) | 1,655,395 (62.2 %) | 121,747 (4.6 %) | 2,427,390 | 0.0 / 0.1 / 7.3 / 92.6 |
+| Tafilah | 2,152 | 27,987 (13.0 %) | 76,308 (35.5 %) | 76,869 (35.7 %) | 34,070 (15.8 %) | 153,177 | 0.0 / 0.0 / 40.4 / 59.5 |
+| Zarqa | 4,318 | 20,206 (4.7 %) | 81,813 (18.9 %) | 272,633 (63.1 %) | 57,130 (13.2 %) | 354,446 | 0.0 / 0.1 / 0.4 / 99.5 |
 
-## What reclamation would take (water)
+## Water: what reclamation would take and what is available locally
 
-| Governorate | Water the best scenario needs, m3/ha/yr: area-weighted median (P10 - P90) | Share of restorable land whose best scenario needs no irrigation |
-|---|---:|---:|
-| Ajloun | 4,081 (3,590 - 4,081) | 0.0 % |
-| Amman | 5,351 (5,147 - 6,848) | 0.0 % |
-| Aqaba | 7,580 (7,580 - 7,580) | 0.0 % |
-| Balqa | 4,310 (4,291 - 6,640) | 0.0 % |
-| Irbid | 4,165 (3,737 - 4,276) | 0.0 % |
-| Jerash | 4,390 (4,167 - 4,647) | 0.0 % |
-| Karak | 5,422 (4,678 - 5,422) | 0.0 % |
-| Ma'an | 7,397 (6,049 - 7,397) | 0.0 % |
-| Madaba | 4,713 (4,707 - 5,533) | 0.0 % |
-| Mafraq | 7,052 (6,441 - 7,052) | 0.0 % |
-| Tafilah | 5,149 (5,087 - 6,240) | 0.0 % |
-| Zarqa | 6,590 (5,697 - 6,590) | 0.0 % |
+| Governorate | Local renewable water (climatic surplus), m3/ha/yr | Irrigation water needed by the cheapest irrigated route, m3/ha/yr | Deficit (need minus local supply), m3/ha/yr | Local water as % of the irrigation need (median) | Land where local renewable water covers the whole need |
+|---|---:|---:|---:|---:|---:|
+| Ajloun | 497 | 3,906 | 3,409 | 12.7 % | 0.0 % |
+| Amman | 68 | 5,351 | 5,284 | 1.3 % | 0.0 % |
+| Aqaba | 20 | 7,440 | 7,420 | 0.3 % | 0.0 % |
+| Balqa | 382 | 4,133 | 3,751 | 9.2 % | 0.0 % |
+| Irbid | 376 | 3,868 | 3,492 | 9.7 % | 0.0 % |
+| Jerash | 261 | 4,183 | 3,922 | 6.2 % | 0.0 % |
+| Karak | 94 | 5,378 | 5,284 | 1.7 % | 0.0 % |
+| Ma'an | 18 | 7,251 | 7,234 | 0.2 % | 0.0 % |
+| Madaba | 167 | 4,473 | 4,306 | 3.7 % | 0.0 % |
+| Mafraq | 34 | 6,885 | 6,851 | 0.5 % | 0.0 % |
+| Tafilah | 105 | 5,126 | 5,028 | 2.1 % | 0.0 % |
+| Zarqa | 26 | 6,445 | 6,419 | 0.4 % | 0.0 % |
 
-Per restorable polygon the model picks the scenario with the highest simulated success probability and reports its central net water requirement (simulated, `expert_rule` equations on observed climate, FAO-56). Because feasibility is conditional on water being available, this is the figure that separates governorates: compare it with the water you can actually supply.
+Area-weighted medians over the land in classes 3 and 4. **Local renewable water** is the mean annual climatic surplus (rainfall minus actual evapotranspiration, TerraClimate 2011-2020, ~4 km; 1 mm = 10 m3/ha): an upper bound on the renewable water generated at that location, with no capture losses. The **requirement** is the central net irrigation need (plus leaching) of the cheapest irrigated scenario (FAO-56 equations on observed climate; effective rainfall is already deducted, so no water is counted twice); rain-fed water harvesting needs no irrigation and is assessed separately. **Deficit** = requirement minus local supply: the water that would have to come from sources this project does not map (groundwater abstraction limits, fossil aquifers such as Disi, national transfers and canals, treated wastewater, dams). It is a simulated planning figure, not a measured water balance.
+
+Across all governorates, 100 % of the land that Model 2 rates high, moderate or low (550,895 ha) is feasible through rain-fed water harvesting, the route that needs no irrigation water; no irrigated route is feasible on local renewable water alone. All other class 3 and 4 land is rated not feasible with local resources (mainly water, in places also slope, soil depth or salinity: see each polygon's limiting factors); irrigated reclamation there would depend on water from outside the area mapped here.
 
 ## Agreement with observed cultivation (consistency check)
 
@@ -60,7 +62,7 @@ Per restorable polygon the model picks the scenario with the highest simulated s
 ## How to read this
 - **Model 1 (suitability)** partitions every governorate into five classes, so the class columns add up to the governorate area and no land is counted twice.
 - **Model 2 (restoration potential)** only evaluates land that Model 1 placed in class 3 or 4 (class 5 land is reported as restricted, never restorable). Its high/moderate/low shares therefore describe the same land as the "not suitable now" column and must not be added to the suitable share.
-- **Feasibility is conditional**: Model 2 assumes a reference irrigation allocation (8,000 m3/ha/yr) and does not map where that water exists. "High" means technically feasible *if the water is supplied*, not that reclamation is economical or that water is available.
+- **Feasibility is water-aware**: each unit's scenarios are limited to the renewable water generated locally (see the water table); there is no universal water allocation. "Not feasible with local resources" means no scenario succeeds on local renewable water (and the soil, slope and depth limits); it does not rule out reclamation with external water that is not mapped here. "High" still does not mean reclamation is economical.
 - **Class 1** ("currently suitable", no limitation) is rare or absent because the rule engine treats low rainfall, steep slopes and calcareous/saline soils as limitations; class 2 ("suitable with limitations") is the main potentially cultivable class. Observed cultivated land is lifted to class 2 at most (so the delivered map partly agrees with observed cultivation by construction); the second table shows the non-circular result with that override switched off.
 - **Validation**: one checkpoint, trained once on all of Jordan, is applied to every governorate. Only the folds named in the last column were held out of training (see `docs/MODEL1_SUITABILITY.md`); for the other governorates the model has seen their land-cover labels, so there is no independent accuracy estimate for them.
 - **Resolution**: effective resolution is about 1 km (Model 1) and 1-4 km (Model 2) regardless of the finer grids.

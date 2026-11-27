@@ -7,7 +7,7 @@ Satellite-informed agricultural land intelligence for Jordan. For each of Jordan
 
 Users open the website, pick a governorate on the satellite map and see its heatmap, area statistics (hectares and dunums), and per-parcel details with the evidence behind every number. There is no image or model upload: the models and datasets run behind the scenes and the results are precomputed per governorate.
 
-> **Scientific status.** Suitability classes are *estimates*: rule-derived (FAO-style land evaluation) combined with a machine-learning cultivation likelihood and observed land cover — never field-verified. Effective resolution is about 1 km (Model 1) and 1–4 km (Model 2), regardless of the finer working grids. Restoration outcomes are simulated and conditional on an assumed water supply. Read [`docs/GOVERNORATES.md`](docs/GOVERNORATES.md) and the model documents before using any number.
+> **Scientific status.** Suitability classes are *estimates*: rule-derived (FAO-style land evaluation) combined with a machine-learning cultivation likelihood and observed land cover — never field-verified. Effective resolution is about 1 km (Model 1) and 1–4 km (Model 2), regardless of the finer working grids. Restoration outcomes are simulated; Model 2 compares each scenario's water need with the renewable water generated locally (climatic surplus), and external water sources are not mapped. Read [`docs/GOVERNORATES.md`](docs/GOVERNORATES.md) and the model documents before using any number.
 
 ## Contents
 * `web/` – Next.js 16 + TypeScript + Tailwind + MapLibre frontend; a server-side allow-listed proxy (`src/app/api/gn`) is the only code that talks to the backend.

@@ -1,9 +1,9 @@
 {
  "model_version": "restoration-0.1.0",
  "region": "jo-balqa",
- "created": "2026-11-27T16:24:29",
+ "created": "2026-11-27T17:14:10",
  "seed": 20261122,
- "runtime_seconds": 7.1,
+ "runtime_seconds": 7.3,
  "checkpoints": {
   "ece": {
    "file": "checkpoints/ece_lgbm.txt",
@@ -72,10 +72,25 @@
  "current_class_basis": "Model 1 suitability.tif + polygons.geojson",
  "model1_inputs": "models/suitability/outputs/jo-balqa",
  "caveats": {
-  "assumed_water_allocation_m3_ha_yr": 8000.0,
+  "assumed_water_allocation_m3_ha_yr": null,
   "feasibility_is_conditional_on_water": true,
   "water_source_availability_mapped": false,
-  "ui_banner": "Feasibility = technically feasible IF the assumed water allocation is supplied; water source, groundwater and wastewater availability are not mapped. All outcomes are simulated, none observed.",
+  "water_supply": {
+   "method": "Irrigation water is limited to the renewable water generated locally: annual climatic surplus P - AET from TerraClimate 2011-2020 (mean; year-to-year sd is the uncertainty), 1 mm = 10 m3/ha, taken at ~4 km and compared with each scenario's net irrigation requirement. Effective rainfall is already inside the requirement (net of rain), so no water is counted twice and neighbouring cells are never pooled.",
+   "evidence": "observed climate; supply and deficit are simulated",
+   "resolution_m": 4000,
+   "upper_bound": "the surplus is an upper bound of locally capturable water (no capture or conveyance losses)",
+   "not_mapped": [
+    "groundwater storage and sustainable-abstraction limits",
+    "fossil aquifers (e.g. Disi)",
+    "national water transfers and canals",
+    "treated wastewater plants",
+    "dams and infrastructure distance",
+    "water rights/licences"
+   ],
+   "reading": "High feasibility means the best scenario's water need is met by local renewable water. Where the need exceeds it, feasibility drops and the water deficit (m3/ha/yr) is the amount that would have to come from sources not mapped here."
+  },
+  "ui_banner": "Feasibility is water-aware: it assumes irrigation can use only the renewable water generated locally (climatic surplus P - AET, ~4 km). External water (transfers, fossil groundwater, treated wastewater) is not mapped, so the deficit shown is what would have to come from elsewhere. All outcomes are simulated, none observed.",
   "restoration_outcomes_observed": false,
   "soil_model_heldout_skill": {
    "ece": {
@@ -113,28 +128,7 @@
     "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
    }
   },
-  "sensitivity_to_water_allocation": {
-   "baseline (water 8000 m3/ha/yr)": {
-    "mean_score": 0.877,
-    "class_flip_rate": 0.0
-   },
-   "water allocation 3000 m3/ha/yr": {
-    "mean_score": 0.027,
-    "class_flip_rate": 0.995
-   },
-   "water allocation 5000 m3/ha/yr": {
-    "mean_score": 0.506,
-    "class_flip_rate": 0.799
-   },
-   "water allocation 12000 m3/ha/yr": {
-    "mean_score": 0.907,
-    "class_flip_rate": 0.005
-   },
-   "water allocation 20000 m3/ha/yr": {
-    "mean_score": 0.925,
-    "class_flip_rate": 0.006
-   }
-  },
+  "sensitivity_to_water_allocation": {},
   "mc_draws": {
    "raster_outer_param_draws": 16,
    "raster_inner_input_draws": 4,
@@ -389,11 +383,6 @@
    "max": 0.3628006220430312,
    "mean": 0.1947813172914637
   },
-  "wcap": {
-   "min": 6150.792559755205,
-   "max": 10718.114741138266,
-   "mean": 8077.8455383995715
-  },
   "ccr_max": {
    "min": 6.288966387291334,
    "max": 11.987649711189519,
@@ -433,6 +422,11 @@
    "min": 0.9,
    "max": 1.0,
    "mean": 0.934375
+  },
+  "wz": {
+   "min": -1.8098782277148817,
+   "max": 3.731106381868319,
+   "mean": 0.040255595172356634
   }
  },
  "factor_assumptions": {
@@ -449,7 +443,7 @@
  "monte_carlo": {
   "note": "outer = parameter draws, inner = input-noise draws; feasibility interval over outer draws"
  },
- "water_reference_allocation_m3_ha_yr": 8000.0,
+ "water_reference_allocation_m3_ha_yr": null,
  "source_studies": {
   "BATJES_2024": {
    "citation": "Batjes, N.H., Calisto, L. & de Sousa, L.M. (2024). Providing quality-assessed and standardised soil data to support global mapping and modelling (WoSIS snapshot 2023). Earth Syst. Sci. Data 16:4735-4765.",

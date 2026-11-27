@@ -144,6 +144,21 @@ export function ScenarioCompare({ ev, interventions }: { ev: PolygonEvaluation; 
               </td>
             ))}
           </tr>
+          {scs.some((s) => s.scenario.local_renewable_water_m3_ha_yr != null) && (
+            <tr>
+              <th scope="row" className="!border-b !border-line !px-3 !py-2 !text-xs">Local renewable water</th>
+              {scs.map((s) => {
+                const sup = s.scenario.local_renewable_water_m3_ha_yr;
+                const def = s.scenario.water_deficit_m3_ha_yr ?? 0;
+                return (
+                  <td key={s.scenario.id} className="text-xs text-ink-2 tnum">
+                    {sup == null ? "—" : `${fmtNum(sup, 0)} m³/ha/yr`}
+                    <span className="mt-1 block text-ink-3">{sup == null ? "" : def > 0 ? `Deficit ${fmtNum(def, 0)} m³/ha/yr must come from sources not mapped here` : "Need is within local supply"}</span>
+                  </td>
+                );
+              })}
+            </tr>
+          )}
           <tr>
             <th scope="row" className="!border-b !border-line !px-3 !py-2 !text-xs">Time to effect</th>
             {scs.map((s) => (

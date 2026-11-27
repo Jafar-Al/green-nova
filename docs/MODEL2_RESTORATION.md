@@ -12,8 +12,9 @@ Version `restoration-0.1.0`. Delivered for **all 12 governorates** (`models/rest
    reversibility class and evidence tag, using FAO IDP29 Table 4 (Maas-Hoffman), FAO SB39 ESP classes, FAO-56 Kc/rooting depth, FAO SB55 relative-yield suitability classes.
 3. **Intervention scenarios (5 archetypes):** drip + fresh groundwater, treated wastewater, brackish water with tolerant crops, rain-fed water harvesting, terraced irrigation; reclamation leaching (C/C0=exp(-k r), FAO 70-90 % removal per unit depth),
    gypsum (stoichiometry = FAO SB39 worked example), organic amendment (assumed range), terracing (assumed limit), water harvesting (FAO C:CA equation), drainage feasibility (probabilistic).
-4. **Monte-Carlo feasibility:** nested draws (16 parameter x 4 input-noise for the raster, 32 x 6 for polygons); feasibility score = P(at least one scenario brings the best crop to relative yield >= 0.6 under the reference water allocation);
+4. **Monte-Carlo feasibility:** nested draws (16 parameter x 4 input-noise for the raster, 32 x 6 for polygons); feasibility score = P(at least one scenario brings the best crop to relative yield >= 0.6 with the water that is locally available, see section 5e);
    interval = 5-95 % over parameter draws; classes cut at 0.15/0.40/0.70. Post-restoration class from the best-crop relative yield (S1>=0.8, S2 0.6-0.8, S3 0.4-0.6, N<0.4).
+   There is **no universal water allocation**: the water a unit can irrigate with is its own locally generated renewable water.
 
 ## 2. Files
 | Path | What |
@@ -31,7 +32,7 @@ Version `restoration-0.1.0`. Delivered for **all 12 governorates** (`models/rest
 
 ## 3. Interface
 ```
-python -m models.restoration.infer --region <region-id> --suitability-dir models/suitability/outputs/<region-id> --out <dir> [--polygon-ids ID ...] [--geometry area.geojson] [--water-cap 8000] [--include-class2] [--no-raster]
+python -m models.restoration.infer --region <region-id> --suitability-dir models/suitability/outputs/<region-id> --out <dir> [--polygon-ids ID ...] [--geometry area.geojson] [--water-cap M3_PER_HA] [--include-class2] [--no-raster]
 ```
 ```python
 from models.restoration.infer import run_region, analyze_geometry, load_runtime
@@ -54,14 +55,21 @@ Conformal tables in `soil_models_meta.json`. Deployment does not need to reload 
 observed: slope/elevation (GLO-30), climate (TerraClimate 2011-2020). ml_predicted: ECe, ESP (own LightGBM + conformal), pH/SOC/texture/CF/BD/CEC/depth (SoilGrids). expert_rule: Maas-Hoffman/ESP tolerance, response curves, class boundaries, erosion index. simulated: interventions, post-restoration class, water requirement, time to effect, feasibility score/interval.
 
 ## 5c. Delivered runs
-All governorates were computed from their own Model 1 output with the same checkpoint and code. **Monte-Carlo budget:** the 11 governorates other than Ma'an use the defaults (raster 16 x 4 = 64 draws/cell, polygons 32 x 6);
-Ma'an's raster was computed earlier with a reduced 12 x 3 = 36 draws/cell (polygons 32 x 6). Re-run Ma'an with the defaults for exact uniformity (`python -m models.restoration.infer --region jo-maan --suitability-dir models/suitability/outputs/jo-maan --out <dir>`, ~10 min).
-Ma'an details (current class from Model 1 `m1-0.1.0`, checkpoint sha256 c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3; reference water 8,000 m3/ha/yr)
+All 12 governorates were computed from their own Model 1 output (current class from Model 1 `m1-0.1.0`, checkpoint sha256 c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3) with the same Model 2 code, the same Monte-Carlo budget
+(raster 16 x 4 = 64 draws per candidate cell, polygons 32 x 6 = 192 draws) and the water-aware method of section 5e. Per-governorate class areas, feasibility shares and water figures are generated into [`GOVERNORATES.md`](GOVERNORATES.md).
 - Inputs: Model 1 `polygons.geojson` (classes 3, 4, 5 used; class 2 skipped unless `--include-class2`) and `suitability.tif` resampled (mode) to the 250 m grid.
-- 511 polygons: 307 high-feasibility (187 class-3 + 120 class-4 polygons; 3,273,274 ha), 204 class-5 polygons = `not_feasible` (restriction, 50,006 ha). Raster: 487,044 candidate cells high, 8,627 class-5 cells not_feasible (others moderate/low: see summary.json).
-- **Monte-Carlo sample counts (reduced to meet the time limit): raster 12 parameter x 3 input draws = 36 draws on all 523,848 candidate cells (no subset, 250 m grid); polygons 32 x 6 = 192 draws.** Runtime 231 s measured (CPU).
-- Machine-readable caveats for the UI are in `summary.json` and `run_metadata.json` under `caveats` (assumed water allocation, `feasibility_is_conditional_on_water`, soil-model held-out skill with CI and conformal coverage, evidence classes, MC draws, effective resolution, sensitivity to water). Show `caveats.ui_banner`.
-- Honest reading: with 8,000 m3/ha/yr nearly all non-restricted land is 'high' (technical feasibility conditional on water); at 3,000 m3/ha/yr the mean score is 0.03, at 5,000 0.51 (`docs/EVAL_model2.md`). Class-3/4 polygons here are large (hundreds to 100,000+ ha) and the soil inputs are ~1 km: per-polygon values are regional, not field-level.
+- Class-5 polygons are `not_feasible` because of a restriction (protected, built-up, water, extreme slope), not for lack of water; the `feasibility.main_limiting_factor` and the water block of each polygon tell the two apart.
+- Machine-readable caveats for the UI are in `summary.json` and `run_metadata.json` under `caveats` (`water_supply` method and evidence, `feasibility_is_conditional_on_water`, soil-model held-out skill with CI and conformal coverage, evidence classes, MC draws, effective resolution). Show `caveats.ui_banner`.
+- Class-3/4 polygons are large (hundreds to 100,000+ ha) and the soil inputs are ~1 km: per-polygon values are regional, not field-level.
+
+## 5e. Water: what is used, what is not
+**Removed:** the earlier universal "reference allocation" of 8,000 m3/ha/yr applied to every unit. It had no geography, so it could not tell Irbid from Aqaba. It survives only as an explicit optional what-if (`--water-cap`, or the client-side water selector in the web UI) and is never the default.
+**Used now:** for each unit, the water supplied to the irrigated scenarios is that location's **local renewable water**: the mean over 2011-2020 of max(P - AET, 0) from TerraClimate (annual precipitation minus actual evapotranspiration, ~4 km, bilinear interpolation to the unit), converted at 1 mm = 10 m3/ha. The year-to-year standard deviation is carried into the Monte-Carlo as supply uncertainty. Supply is therefore geographic (high in the north-western highlands, near zero in the eastern and southern desert) and is an *upper bound* on locally generated renewable water: no runoff capture, storage or infiltration losses are applied.
+- **Required water** (net irrigation requirement, FAO-56 `ETc - effective rainfall`, plus the leaching requirement) is computed per scenario from observed climate. Effective rainfall is deducted from the requirement and is not also counted as supply from irrigation, so rainfall is not counted twice.
+- **Deficit** = max(central requirement - local renewable supply, 0), reported per scenario as `water_deficit_m3_ha_yr`, and for every polygon (also the not-feasible ones) in `properties.water.irrigation` (cheapest irrigated route: requirement, local supply, deficit, surplus, share of the need met locally); **surplus** is the reverse. Where the requirement exceeds the supply, the delivered water fraction falls below 1, relative yield falls with the crop's yield-response factor Ky (`RY = 1 - Ky (1 - supply/demand)`), and feasibility falls with it, so land that needs far more water than it generates cannot be classed 'high'. Rain-fed scenarios have no irrigation demand and are unaffected.
+- **Not mapped (stated, never filled with invented numbers):** groundwater recharge and sustainable abstraction limits (no basin-resolved dataset is included), fossil aquifers (e.g. Disi), surface-water storage and dam yields, national transfers and canals (King Abdullah Canal), treated-wastewater volumes and plant locations, infrastructure and water-rights allocations. `caveats.water_supply.not_mapped` lists them. A unit marked 'not feasible' could still be reclaimed with such external water if its other limits allow; a unit marked 'high' may still compete with other uses for the local surplus.
+- **Resolution and uncertainty:** the climate grid is ~4 km, so the water figure is regional and a single value serves many 250 m cells.
+- Actual water availability is **not established** by this method: it states what the local climate generates and how that compares with the scenario's need, nothing more.
 
 ## 5d. Sub-area / polygon queries in seconds
 `analyze_geometry()`, `--polygon-ids`, `--geometry` read only `runtime_data/<region>/stack.npz` (zonal statistics on the 250 m stack + climate interpolation + Monte-Carlo for the selected units); `--no-raster` skips the region raster. About 1 s per geometry (measured 0.7 s). Typed progress callback `progress(fraction, message)`.
@@ -69,10 +77,10 @@ Ma'an details (current class from Model 1 `m1-0.1.0`, checkpoint sha256 c24c5cf0
 ## 6. Known failure modes / limitations (read these)
 - The ECe/ESP models have **weak skill on held-out geography** (see `docs/MODEL2_EVALUATION.md`): the spatial pattern of salinity/sodicity inside a governorate is mostly a regional prior with very wide intervals. The same applies to all 12 governorates.
 - SOC has no regional skill in SoilGrids at arid held-out sites; depth to bedrock is uninformative (cap).
-- Water SOURCE availability/quality, groundwater depth, aquifer sustainability and wastewater plant locations are **not mapped**; feasibility is conditional on a reference water allocation (default 8,000 m3/ha/yr, a scenario condition) - see sensitivity table.
+- Water SOURCE availability/quality, groundwater depth, aquifer sustainability, canals, dams and wastewater plant locations are **not mapped**. Feasibility compares each scenario's need with the renewable water generated locally (section 5e), an upper bound with ~4 km resolution; water that is imported or abstracted from groundwater is outside the model.
 - Climate window is 2011-2020 (10 years) for the design rainfall; salinity/sodicity effective resolution ~1 km, climate ~4 km: do not read sub-km polygon values as measurements.
 - Wind erosion, flash floods, frost damage, economics are not modelled. Response curves other than Maas-Hoffman/ESP classes are documented assumptions (`engine.FACTOR_ASSUMPTIONS`).
 - Agreement with expert-rule labels measures consistency, not real restoration success.
 
 ## 7. Validation status (honest)
-Done: block-CV and held-out-region validation of ECe/ESP (weak skill), SoilGrids arid-site error check, held-out-region pipeline consistency (no discriminating power), sensitivity analysis, ETo cross-check, 11 unit/contract/example tests. **Pending, not estimated:** observed-analog check (existing irrigated cropland vs feasibility), AfSIS/iSDA domain-shift test, Hassani global-map benchmark, 30-year climate, own pH/SOC/texture models, any calibration against real restoration outcomes (none exist). Sensitivity table was computed on the stand-in run (16x4 draws, reference water 8,000); the delivered Model 1 run uses 12x3 draws.
+Done: block-CV and held-out-region validation of ECe/ESP (weak skill), SoilGrids arid-site error check, held-out-region pipeline consistency (no discriminating power), sensitivity analysis, ETo cross-check, 11 unit/contract/example tests. **Pending, not estimated:** observed-analog check (existing irrigated cropland vs feasibility), AfSIS/iSDA domain-shift test, Hassani global-map benchmark, 30-year climate, own pH/SOC/texture models, any calibration against real restoration outcomes (none exist). The sensitivity table in `MODEL2_EVALUATION.md` was computed on the earlier Ma'an stand-in run under uniform water allocations (legacy what-if, `eval/evaluate.py`); it is kept for the other parameters but does not describe the delivered, geographic water treatment.

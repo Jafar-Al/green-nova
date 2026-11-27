@@ -57,13 +57,14 @@ def test_erosion_index_monotonic_in_slope():
     assert a[0] < a[1] < a[2] <= 1.0
 
 
-def _units(n=64, ece=3.0, esp=4.0, slope=1.0, depth=150.0, ppt=60.0):
+def _units(n=64, ece=3.0, esp=4.0, slope=1.0, depth=150.0, ppt=60.0, wsup=8000.0):
     one = np.ones(n, "float32")
     w = np.array([.2, .18, .15, .08, .03, 0, 0, 0, .01, .05, .12, .18]); w /= w.sum()
     return engine.Units(ece=ece * one, ece_lsd=0.1 * one, esp=esp * one, esp_sd=2 * one, ph=8.1 * one, ph_sd=0.3 * one, soc=0.4 * one, soc_rsd=0.4 * one, sand=40 * one, clay=25 * one,
                         tex_sd=8 * one, cf=10 * one, bd=1.4 * one, cec=12 * one, depth=depth * one, depth_lsd=0.1 * one, slope=slope * one,
                         ppt_m=(ppt * w)[:, None] * np.ones((12, n), "float32"), eto_m=np.array([60, 75, 115, 160, 200, 235, 250, 230, 185, 140, 90, 60.], "float32")[:, None] * np.ones((12, n), "float32"),
-                        p67=ppt * 0.8 * one, tmin_cold=2 * one, salt_flat=np.zeros(n, bool), restricted=np.zeros(n, bool))
+                        p67=ppt * 0.8 * one, tmin_cold=2 * one, salt_flat=np.zeros(n, bool), restricted=np.zeros(n, bool),
+                        wsup=None if wsup is None else wsup * one, wsup_sd=None if wsup is None else 0.1 * wsup * one)
 
 
 def test_engine_monotone_and_deterministic():
@@ -91,6 +92,20 @@ def test_water_allocation_monotone():
     lo = engine.evaluate(u, J=8, I=2, seed=1, water_cap=2000.0)["score"].mean()
     hi = engine.evaluate(u, J=8, I=2, seed=1, water_cap=15000.0)["score"].mean()
     assert hi >= lo
+
+
+def test_local_water_supply_changes_feasibility_without_a_universal_allocation():
+    """Same soil and climate, different locally generated water: the unit with (almost) no local renewable water must be less feasible, and
+    the engine must refuse to run irrigated scenarios with no water information at all (no hidden default allocation)."""
+    dry = engine.evaluate(_units(ppt=40.0, wsup=0.0), J=8, I=2, seed=1)
+    wet = engine.evaluate(_units(ppt=40.0, wsup=15000.0), J=8, I=2, seed=1)
+    assert wet["score"].mean() > dry["score"].mean() + 0.2
+    mid = engine.evaluate(_units(ppt=40.0, wsup=1500.0), J=8, I=2, seed=1)
+    assert dry["score"].mean() <= mid["score"].mean() <= wet["score"].mean() + 1e-9
+    with pytest.raises(ValueError):
+        engine.evaluate(_units(ppt=40.0, wsup=None), J=8, I=2, seed=1)
+    # the legacy uniform what-if still works when it is asked for explicitly
+    assert engine.evaluate(_units(ppt=40.0, wsup=None), J=8, I=2, seed=1, water_cap=8000.0)["score"].shape == (64,)
 
 
 @pytest.mark.skipif(not (OUT / "polygons.geojson").exists(), reason="outputs not generated yet")

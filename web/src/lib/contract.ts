@@ -153,6 +153,10 @@ export interface RestorationScenario {
   post_class_code: SuitabilityClassCode;
   post_class_probability: number;
   water_requirement_m3_ha_yr: WaterRequirement;
+  /** Renewable water generated locally (climatic surplus, ~4 km), m3/ha/yr. Absent in older outputs and in demonstration data. */
+  local_renewable_water_m3_ha_yr?: number | null;
+  /** max(central requirement - local renewable water, 0): water that would have to come from sources the model does not map. */
+  water_deficit_m3_ha_yr?: number | null;
   water_sources: string[];
   infrastructure: string[];
   crop_categories: string[];

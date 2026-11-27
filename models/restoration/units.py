@@ -24,7 +24,7 @@ def interp_climate(climate: dict, lon, lat):
     def one(a2d):
         return RegularGridInterpolator((lat_g[order], lon_g), a2d[order, :], method="linear", bounds_error=False, fill_value=None)(pts)
     out = {k: np.stack([one(climate[k][m]) for m in range(12)]) for k in ("ppt_m", "eto_m")}
-    for k in ("p67", "p_mean", "tmin_cold", "eto_hg_annual", "p_cv", "t_mean"):
+    for k in ("p67", "p_mean", "tmin_cold", "eto_hg_annual", "p_cv", "t_mean", "water_surplus_mm", "water_surplus_sd_mm"):
         if k in climate:
             out[k] = one(climate[k])
     return out
@@ -65,7 +65,9 @@ def units_from_values(v: dict, clim: dict, restricted=None, salt_flat=None, extr
         depth=depth, depth_lsd=np.full(n, DEPTH_LSD, "float32"), slope=slope,
         ppt_m=clim["ppt_m"].astype("float32"), eto_m=clim["eto_m"].astype("float32"), p67=clim["p67"].astype("float32"),
         tmin_cold=clim["tmin_cold"].astype("float32"), salt_flat=np.asarray(salt_flat, bool),
-        restricted=np.zeros(n, bool) if restricted is None else np.asarray(restricted, bool))
+        restricted=np.zeros(n, bool) if restricted is None else np.asarray(restricted, bool),
+        wsup=(np.clip(clim["water_surplus_mm"], 0, None) * 10.0).astype("float32") if "water_surplus_mm" in clim else None,       # 1 mm = 10 m3/ha
+        wsup_sd=(np.clip(clim["water_surplus_sd_mm"], 0, None) * 10.0).astype("float32") if "water_surplus_sd_mm" in clim else None)
 
 
 def zonal_stats(layers: dict, grid: Grid, geoms, ids):

@@ -32,9 +32,10 @@ These RMSE values are the 1-sigma input uncertainties of pH/SOC/texture in the M
 104 measured WoSIS topsoil profiles in the held-out region: soil described (a) by measurement vs (b) only by covariates (held-out-region ECe model + SoilGrids); climate, ESP, CEC, CF, depth, slope fixed.
 Observed-state classes 100 high / 2 moderate / 2 low; predicted-state 104 high. Accuracy 0.96, within-one-class 0.98, mean |score error| 0.078, Spearman of scores 0.04 (no ranking skill),
 predicted 5-95 % interval contains the observed-state score for 94 % of profiles (mean width 0.26).
-Reading: under the reference water allocation almost everything is "high", so this test has little discriminating power; it shows insensitivity to soil-prediction error at that allocation, not skill.
+Reading: this test was run with the legacy uniform 8,000 m3/ha/yr allocation (since removed as the default), under which almost everything is "high", so it had little discriminating power; it shows insensitivity to soil-prediction error at that allocation, not skill.
 
-## 4. Sensitivity (E3; 20,000 random Ma'an cells, 16x4 draws)
+## 4. Sensitivity (E3; 20,000 random Ma'an cells, 16x4 draws; LEGACY uniform water allocation)
+_These runs used the explicit uniform what-if `water_cap` (the former default of 8,000 m3/ha/yr). The delivered outputs no longer use a uniform allocation: supply is each location's local renewable water (`docs/MODEL2_RESTORATION.md` section 5e). Re-run `eval/evaluate.py` for current figures._
 | Change | mean score | class flip rate | Spearman vs baseline |
 |---|---|---|---|
 | baseline: reference water 8,000 m3/ha/yr | 0.877 | - | 1.00 |
@@ -44,7 +45,7 @@ Reading: under the reference water allocation almost everything is "high", so th
 | ECe uncertainty x0.5; ECe x2; ESP x2 | 0.968; 0.775; 0.857 | 0.006; 0.144; 0.016 | 0.68; 0.84; 0.92 |
 | max leaching depth ratio 0.7; gypsum cap 8 t/ha; ETo +20 % | 0.857; 0.813; 0.818 | 0.004; 0.086; 0.091 | 0.95; 0.81; 0.86 |
 
-**The water allocation is the decisive assumption**: below about 5,000 m3/ha/yr the same land flips to low/not feasible. Read feasibility as "technically feasible if the stated water is supplied".
+**Water is the decisive input**: under a uniform allocation below about 5,000 m3/ha/yr the same land flips to low/not feasible. That is why the delivered Model 2 uses geographically varying local renewable water instead of one number; read feasibility as "feasible with the water stated in the water block", not as proven availability.
 
 ## 5. ETo cross-check (E5)
 Hargreaves (FAO-56 eq. 52) / TerraClimate Penman-Monteith over 4,032 region cells: mean 0.86 (5-95 %: 0.82-0.90); PM annual ETo median 1,932 mm. The engine uses PM with a +-10 % lognormal factor.

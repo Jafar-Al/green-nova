@@ -103,7 +103,7 @@ def read_m1_class_raster(suit_dir: Path, grid: stack.Grid) -> Optional[np.ndarra
 
 
 # ------------------------------------------------------------------ cell raster run
-def run_cells(rt: dict, cls_raster: np.ndarray, progress: Progress = _noop, J: int = 16, I: int = 4, water_cap: float = 8000.0, seed: int = config.SEED, classes=(3, 4)):
+def run_cells(rt: dict, cls_raster: np.ndarray, progress: Progress = _noop, J: int = 16, I: int = 4, water_cap: float | None = None, seed: int = config.SEED, classes=(3, 4)):
     g, L = rt["grid"], rt["layers"]
     cand = rt["mask"] & np.isin(cls_raster, list(classes))
     restricted_cells = rt["mask"] & (cls_raster == 5)
@@ -143,7 +143,7 @@ def _polys_from_raster(cls_raster, grid, mask, classes=(3, 4)):
     return feats
 
 
-def run_polygons(rt: dict, polys: list, progress: Progress = _noop, J: int = 32, I: int = 6, water_cap: float = 8000.0, seed: int = config.SEED, region_id="jo-maan"):
+def run_polygons(rt: dict, polys: list, progress: Progress = _noop, J: int = 32, I: int = 6, water_cap: float | None = None, seed: int = config.SEED, region_id="jo-maan"):
     """polys: list of dict(id, geom (shapely, EPSG:4326), class_code, source_props). Returns list of GeoJSON-like feature dicts (contract properties)."""
     import geopandas as gpd
     g, L = rt["grid"], rt["layers"]
@@ -207,7 +207,7 @@ def load_m1_polygons(suit_dir: Path, polygon_ids=None, classes=(3, 4, 5)):
     return [dict(id=str(r["id"]), geom=r.geometry, class_code=int(r["class_code"])) for _, r in g.to_crs(4326).iterrows()]
 
 
-def analyze_geometry(geometry: dict, region_id: str = "jo-maan", current_class: int = 4, progress: Progress = _noop, water_cap: float = 8000.0, runtime_dir=None):
+def analyze_geometry(geometry: dict, region_id: str = "jo-maan", current_class: int = 4, progress: Progress = _noop, water_cap: float | None = None, runtime_dir=None):
     """Feasibility for one arbitrary GeoJSON geometry (EPSG:4326). Returns a contract-shaped Feature dict. Seconds on cached features."""
     from shapely.geometry import shape
     try:
@@ -222,7 +222,7 @@ def analyze_geometry(geometry: dict, region_id: str = "jo-maan", current_class: 
 
 
 def run_region(region_id: str = "jo-maan", suitability_dir: Optional[str] = None, out_dir: Optional[str] = None, polygon_ids=None, geometry=None, progress: Progress = _noop,
-               water_cap: float = 8000.0, runtime_dir=None, seed: int = config.SEED, include_class2: bool = False, raster: bool = True,
+               water_cap: float | None = None, runtime_dir=None, seed: int = config.SEED, include_class2: bool = False, raster: bool = True,
                mc_outer: int = 16, mc_inner: int = 4, mc_outer_poly: int = 32, mc_inner_poly: int = 6) -> dict:
     t0 = time.time()
     rt = load_runtime(region_id, runtime_dir)
@@ -277,7 +277,7 @@ def main(argv=None):
     ap.add_argument("--out", default=None)
     ap.add_argument("--polygon-ids", nargs="*", default=None)
     ap.add_argument("--geometry", default=None, help="GeoJSON file (EPSG:4326) of one area to analyse")
-    ap.add_argument("--water-cap", type=float, default=8000.0, help="reference water allocation m3/ha/yr (scenario condition)")
+    ap.add_argument("--water-cap", type=float, default=None, help="OPTIONAL legacy what-if: force one uniform irrigation allocation m3/ha/yr for every unit. Default: each unit's own locally generated renewable water")
     ap.add_argument("--no-raster", action="store_true")
     ap.add_argument("--mc-outer", type=int, default=16)
     ap.add_argument("--mc-inner", type=int, default=4)

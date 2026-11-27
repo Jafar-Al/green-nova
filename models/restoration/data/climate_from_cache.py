@@ -8,7 +8,7 @@ def build(region_id="jo-maan", pad=0.15):
     d = config.COV / "terraclimate"
     bb = config.REGIONS[region_id]["bbox_4326_fallback"]
     out = {}
-    for v in ("ppt", "pet", "tmax", "tmin"):
+    for v in ("ppt", "pet", "tmax", "tmin", "aet"):
         z = np.load(d / f"_raw_{v}_2011_2020.npz")
         lat, lon, a = z["lat"], z["lon"], z["data"]
         y0, y1 = int(z["y0"]), int(z["y1"])
@@ -19,6 +19,8 @@ def build(region_id="jo-maan", pad=0.15):
         sub = sub.reshape(ny, 12, len(ii), len(jj))
         out["lat"], out["lon"] = lat[ii], lon[jj]
         out[v] = np.nanmean(sub, axis=0).astype("float32")
+        if v == "aet":
+            out["aet_annual_y"] = np.nansum(sub, axis=1).astype("float32")   # actual evapotranspiration per year (ny, lat, lon), mm
         if v == "ppt":
             out["ppt_annual"] = np.nansum(sub, axis=1).astype("float32")
             out["years"] = np.arange(y0, y1 + 1)

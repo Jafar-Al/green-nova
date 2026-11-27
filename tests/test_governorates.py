@@ -124,3 +124,39 @@ def test_provenance_matches_the_committed_checkpoint(rid):
     m2 = _load(M2 / rid / "run_metadata.json")
     assert "model1_run" in m2 and m2["model1_run"]["checkpoint_sha256"] == sha, "Model 2 must consume this governorate's Model 1 output"
     assert m2["caveats"]["feasibility_is_conditional_on_water"] is True
+    assert m2["caveats"]["assumed_water_allocation_m3_ha_yr"] is None, "no universal water allocation may be assumed"
+    ws = m2["caveats"]["water_supply"]
+    assert ws["not_mapped"] and "local" in ws["method"].lower()
+
+
+def test_water_differs_between_governorates_and_limits_feasibility():
+    """Water must actually change the assessment: the climatically wetter north has far more local renewable water than the desert south,
+    and feasibility is not the same for every governorate (no universal allocation)."""
+    def stats(rid):
+        sup, wts, high, tot = 0.0, 0.0, 0.0, 0.0
+        for f in _load(M2 / rid / "polygons.geojson")["features"]:
+            p = f["properties"]
+            if p["current_class_code"] not in (3, 4):
+                continue
+            a = p["area_ha"]
+            sup += p["water"]["local_renewable_supply_m3_ha_yr"]["central"] * a
+            wts += a
+            tot += a
+            high += a if p["feasibility"]["class"] == "high" else 0.0
+        return sup / wts, high / tot
+    for rid in REGIONS:   # required vs available vs deficit are consistent, and land that needs far more water than it can get is never rated high
+        for f in _load(M2 / rid / "polygons.geojson")["features"]:
+            p = f["properties"]
+            irr = p["water"]["irrigation"]
+            if irr is not None:   # None only where no irrigated scenario has a finite water figure (a few tiny, extremely saline polygons)
+                assert abs(irr["deficit_m3_ha_yr"] - max(irr["central_requirement_m3_ha_yr"] - irr["local_renewable_supply_m3_ha_yr"], 0)) <= 1.5
+                assert 0 <= irr["share_of_need_met_locally"] <= 1
+            if p["feasibility"]["class"] == "high":
+                best = next(s for s in p["scenarios"] if s["id"] == p["feasibility_meta"]["best_scenario"])
+                need = best["water_requirement_m3_ha_yr"]["central"]
+                assert best["water_deficit_m3_ha_yr"] <= 0.3 * need or best["water_deficit_m3_ha_yr"] == 0, (rid, p["id"], best["water_deficit_m3_ha_yr"], need)
+    north, south = stats("jo-irbid"), stats("jo-maan")
+    assert north[0] > 3 * south[0], (north, south)
+    shares = {rid: stats(rid)[1] for rid in REGIONS}
+    assert max(shares.values()) - min(shares.values()) > 0.02, "high-feasibility share must vary with local water"
+    assert shares["jo-irbid"] >= shares["jo-maan"]

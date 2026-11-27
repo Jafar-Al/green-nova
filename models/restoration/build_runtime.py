@@ -44,7 +44,7 @@ def sg_layer(prop: str, grid: stack.Grid, scale: float = 1.0):
 
 def bdricm(grid: stack.Grid, cache: Path) -> np.ndarray:
     """SoilGrids 2017 absolute depth to bedrock (cm, capped at 200), window read once and cached."""
-    tif = cache / "bdricm_window.tif"
+    tif = cache / f"bdricm_{int(grid.x0)}_{int(grid.y0)}_{grid.width}x{grid.height}.tif"     # one window per governorate grid (a shared name served Ma'an's window to every region)
     if not tif.exists():
         os.environ.update(GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR", CPL_VSIL_CURL_ALLOWED_EXTENSIONS=".tif", GDAL_HTTP_MAX_RETRY="5", GDAL_HTTP_RETRY_DELAY="3")
         u = "/vsicurl/https://files.isric.org/soilgrids/former/2017-03-10/data/BDRICM_M_250m_ll.tif"
@@ -65,11 +65,15 @@ def climate_arrays(region_id: str) -> dict:
     lat, lon = z["lat"], z["lon"]
     ppt, pet, tmax, tmin = z["ppt"], z["pet"], z["tmax"], z["tmin"]
     ann = z["ppt_annual"]
+    extra = {}
+    if "aet_annual_y" in z.files:   # locally generated renewable water = annual climatic surplus P - AET (>= 0), mean and year-to-year sd over 2011-2020
+        sur = np.clip(ann - z["aet_annual_y"], 0, None)
+        extra = dict(water_surplus_mm=sur.mean(0).astype("float32"), water_surplus_sd_mm=sur.std(0).astype("float32"))
     LAT = np.broadcast_to(lat[:, None], ann.shape[1:])
     eto_hg = hydro.eto_hargreaves_monthly(tmin, tmax, LAT[None] if False else LAT)
     return dict(lat=lat, lon=lon, ppt_m=ppt.astype("float32"), eto_m=pet.astype("float32"), p_mean=ann.mean(0).astype("float32"), p67=hydro.design_rainfall_67(ann).astype("float32"),
                 p_cv=(ann.std(0) / np.maximum(ann.mean(0), 1e-3)).astype("float32"), tmin_cold=tmin.min(0).astype("float32"), t_mean=(0.5 * (tmin + tmax)).mean(0).astype("float32"),
-                eto_hg_annual=eto_hg.sum(0).astype("float32"), eto_pm_annual=pet.sum(0).astype("float32"), ppt_annual=ann.astype("float32"))
+                eto_hg_annual=eto_hg.sum(0).astype("float32"), eto_pm_annual=pet.sum(0).astype("float32"), ppt_annual=ann.astype("float32"), **extra)
 
 
 def build(region_id: str = "jo-maan", out_dir: Path | None = None) -> Path:

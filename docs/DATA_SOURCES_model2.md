@@ -39,7 +39,9 @@ manufactured as ground truth. Evidence classes: observed / ml_predicted / expert
 
 ## 6. Climate / terrain - USED
 - WorldClim 2.1 (https://geodata.ucdavis.edu/climate/worldclim/2_1/base/): `wc2.1_5m_bio.zip` 179,563,774 B, `wc2.1_30s_elev.zip` 338,188,707 B (global ECe/ESP covariates). Licence not re-verified in this session.
-- TerraClimate monthly ppt/pet/tmax/tmin: model1's cached raw arrays 2011-2020 (Planetary Computer zarr); **10-year window** used for climatology and the 2-in-3-years design rainfall (a 30-year record would be better).
+- TerraClimate monthly ppt/pet/tmax/tmin/aet: model1's cached raw arrays 2011-2020 (Planetary Computer zarr); **10-year window** used for climatology and the 2-in-3-years design rainfall (a 30-year record would be better).
+  Local renewable water = mean over the 10 years of max(annual ppt - annual aet, 0) (mm, x10 = m3/ha), its year-to-year SD as supply uncertainty; the only water-supply data in the model. TerraClimate is ~4 km and model-derived (its AET comes from a water-balance model), CC0.
+  **Not included:** groundwater recharge/abstraction limits, aquifer maps, dam/canal/transfer volumes, wastewater plants - no verified, open, Jordan-wide dataset was available in this project, so none is used or invented.
 - Copernicus GLO-30 DEM (model1 cache, `dem_cop30`) -> 50 m slope -> 250 m. Boundary: geoBoundaries gbOpen JOR ADM1 (CC BY 2.5, 2006 vintage), canonical copy by model1.
 
 ## 7. Authoritative documents used for thresholds/equations (read in full text; see `models/restoration/knowledge/sources.py`)

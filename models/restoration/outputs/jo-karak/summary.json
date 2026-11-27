@@ -1,10 +1,25 @@
 {
  "region": "jo-karak",
  "caveats": {
-  "assumed_water_allocation_m3_ha_yr": 8000.0,
+  "assumed_water_allocation_m3_ha_yr": null,
   "feasibility_is_conditional_on_water": true,
   "water_source_availability_mapped": false,
-  "ui_banner": "Feasibility = technically feasible IF the assumed water allocation is supplied; water source, groundwater and wastewater availability are not mapped. All outcomes are simulated, none observed.",
+  "water_supply": {
+   "method": "Irrigation water is limited to the renewable water generated locally: annual climatic surplus P - AET from TerraClimate 2011-2020 (mean; year-to-year sd is the uncertainty), 1 mm = 10 m3/ha, taken at ~4 km and compared with each scenario's net irrigation requirement. Effective rainfall is already inside the requirement (net of rain), so no water is counted twice and neighbouring cells are never pooled.",
+   "evidence": "observed climate; supply and deficit are simulated",
+   "resolution_m": 4000,
+   "upper_bound": "the surplus is an upper bound of locally capturable water (no capture or conveyance losses)",
+   "not_mapped": [
+    "groundwater storage and sustainable-abstraction limits",
+    "fossil aquifers (e.g. Disi)",
+    "national water transfers and canals",
+    "treated wastewater plants",
+    "dams and infrastructure distance",
+    "water rights/licences"
+   ],
+   "reading": "High feasibility means the best scenario's water need is met by local renewable water. Where the need exceeds it, feasibility drops and the water deficit (m3/ha/yr) is the amount that would have to come from sources not mapped here."
+  },
+  "ui_banner": "Feasibility is water-aware: it assumes irrigation can use only the renewable water generated locally (climatic surplus P - AET, ~4 km). External water (transfers, fossil groundwater, treated wastewater) is not mapped, so the deficit shown is what would have to come from elsewhere. All outcomes are simulated, none observed.",
   "restoration_outcomes_observed": false,
   "soil_model_heldout_skill": {
    "ece": {
@@ -42,28 +57,7 @@
     "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
    }
   },
-  "sensitivity_to_water_allocation": {
-   "baseline (water 8000 m3/ha/yr)": {
-    "mean_score": 0.877,
-    "class_flip_rate": 0.0
-   },
-   "water allocation 3000 m3/ha/yr": {
-    "mean_score": 0.027,
-    "class_flip_rate": 0.995
-   },
-   "water allocation 5000 m3/ha/yr": {
-    "mean_score": 0.506,
-    "class_flip_rate": 0.799
-   },
-   "water allocation 12000 m3/ha/yr": {
-    "mean_score": 0.907,
-    "class_flip_rate": 0.005
-   },
-   "water allocation 20000 m3/ha/yr": {
-    "mean_score": 0.925,
-    "class_flip_rate": 0.006
-   }
-  },
+  "sensitivity_to_water_allocation": {},
   "mc_draws": {
    "raster_outer_param_draws": 16,
    "raster_inner_input_draws": 4,
@@ -126,68 +120,68 @@
  },
  "raster_cells": {
   "not_feasible": {
-   "cells": 9853,
-   "area_ha": 61581.2,
-   "area_dunum": 615812.0,
-   "share": 0.2642
+   "cells": 27835,
+   "area_ha": 173968.8,
+   "area_dunum": 1739688.0,
+   "share": 0.7463
   },
   "low": {
-   "cells": 666,
-   "area_ha": 4162.5,
-   "area_dunum": 41625.0,
-   "share": 0.0179
+   "cells": 2694,
+   "area_ha": 16837.5,
+   "area_dunum": 168375.0,
+   "share": 0.0722
   },
   "moderate": {
-   "cells": 2110,
-   "area_ha": 13187.5,
-   "area_dunum": 131875.0,
-   "share": 0.0566
+   "cells": 5083,
+   "area_ha": 31768.8,
+   "area_dunum": 317688.0,
+   "share": 0.1363
   },
   "high": {
-   "cells": 24668,
-   "area_ha": 154175.0,
-   "area_dunum": 1541750.0,
-   "share": 0.6614
+   "cells": 1685,
+   "area_ha": 10531.2,
+   "area_dunum": 105312.0,
+   "share": 0.0452
   }
  },
  "raster_best_scenario_cells": {
-  "irr_fresh": 8337,
-  "irr_tww": 2143,
-  "irr_brackish": 382,
-  "rainfed_wh": 0,
-  "terraced_irr": 17826
+  "irr_fresh": 18047,
+  "irr_tww": 0,
+  "irr_brackish": 0,
+  "rainfed_wh": 10641,
+  "terraced_irr": 0
  },
  "raster_post_class_cells": {
-  "1": 21812,
-  "2": 3530,
-  "3": 0,
-  "4": 3346
+  "1": 819,
+  "2": 4227,
+  "3": 5343,
+  "4": 18299
  },
  "raster_class5_not_feasible_cells": 8609,
  "polygons_by_feasibility": {
   "not_feasible": {
-   "polygon_count": 145,
-   "area_ha": 53879.1,
-   "area_dunum": 538791.0,
-   "share": 0.2305
+   "polygon_count": 518,
+   "area_ha": 174912.1,
+   "area_dunum": 1749121.0,
+   "share": 0.7482
   },
   "low": {
-   "polygon_count": 0,
-   "area_ha": 0.0,
-   "area_dunum": 0.0,
-   "share": 0.0
+   "polygon_count": 47,
+   "area_ha": 2222.0,
+   "area_dunum": 22220.0,
+   "share": 0.0095
   },
   "moderate": {
-   "polygon_count": 1,
-   "area_ha": 17.0,
-   "area_dunum": 170.0,
-   "share": 0.0001
+   "polygon_count": 50,
+   "area_ha": 25303.0,
+   "area_dunum": 253030.0,
+   "share": 0.1082
   },
   "high": {
-   "polygon_count": 480,
-   "area_ha": 179880.1,
-   "area_dunum": 1798801.0,
-   "share": 0.7695
+   "polygon_count": 11,
+   "area_ha": 31339.1,
+   "area_dunum": 313391.0,
+   "share": 0.1341
   }
  },
  "polygons_with_severe_limiting_factor(>=0.3)": {
@@ -197,32 +191,31 @@
   "restriction": 145
  },
  "polygons_by_best_scenario": {
-  "terraced_irr": 445,
-  "irr_fresh": 164,
-  "irr_tww": 17
+  "rainfed_wh": 480,
+  "irr_fresh": 146
  },
  "headline": {
   "n_polygons": 626,
   "by_class": {
-   "not_feasible": 145,
-   "low": 0,
-   "moderate": 1,
-   "high": 480
+   "not_feasible": 518,
+   "low": 47,
+   "moderate": 50,
+   "high": 11
   },
   "area_ha_by_class": {
-   "not_feasible": 53879.1,
-   "low": 0.0,
-   "moderate": 17.0,
-   "high": 179880.1
+   "not_feasible": 174912.1,
+   "low": 2222.0,
+   "moderate": 25303.0,
+   "high": 31339.1
   },
-  "water_cap_m3_ha_yr": 8000.0,
+  "water_cap_m3_ha_yr": null,
   "current_class_basis": "Model 1 suitability.tif + polygons.geojson"
  },
  "notes": [
   "Areas in equal-area EPSG:6933; 1 dunum = 1,000 m2 = 0.1 ha.",
   "Class 5 (restricted) polygons are never restorable: reported as not_feasible with limiting factor 'restriction'.",
   "All feasibility, post-restoration class, water requirement and time-to-effect values are simulated; none is an observed restoration result.",
-  "Feasibility is conditional on a reference water allocation (scenario condition) and on water SOURCE availability, which is not mapped."
+  "Feasibility uses the renewable water generated locally (climatic surplus P - AET, ~4 km); water SOURCES (groundwater limits, fossil aquifers, transfers, wastewater, dams) are not mapped."
  ],
  "source_studies": {
   "BATJES_2024": {

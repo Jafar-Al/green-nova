@@ -10,8 +10,8 @@ export function Model2Caveats({ className = "" }: { className?: string }) {
   return (
     <aside aria-label="How to read restoration results" className={`grid gap-1.5 rounded-sm border border-warn/60 p-3 text-xs text-ink-2 ${className}`}>
       <p className="m-0 text-ink">
-        <strong>Read these results as conditional.</strong> Feasibility assumes a reference water allocation (8,000 m&sup3;/ha/yr by default). It means &ldquo;technically feasible if water is supplied&rdquo;. Water source availability, quality and aquifer
-        sustainability are not mapped, and most cells therefore come out highly feasible.
+        <strong>Feasibility is water-aware.</strong> Irrigation is limited to the renewable water generated locally (climatic surplus, rainfall minus evapotranspiration, about 4 km resolution). Where a scenario needs more than that, feasibility falls and the
+        water deficit shows how much would have to come from sources that are not mapped here: groundwater limits, fossil aquifers, national transfers, treated wastewater and canals.
       </p>
       <Disclosure summary="More caveats" className="rounded-sm border border-line px-3">
         <ul className="m-0 grid list-disc gap-1 ps-4 text-xs text-ink-2">

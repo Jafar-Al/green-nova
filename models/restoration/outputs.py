@@ -93,8 +93,14 @@ def _caveats(water_cap: float, mc: dict | None, standin: bool, m1: dict | None) 
             sens[row["name"]] = dict(mean_score=round(row["mean_score"], 3), class_flip_rate=round(row["class_flip_rate"], 3))
     return dict(
         assumed_water_allocation_m3_ha_yr=water_cap, feasibility_is_conditional_on_water=True, water_source_availability_mapped=False,
-        ui_banner="Feasibility = technically feasible IF the assumed water allocation is supplied; water source, groundwater and wastewater availability are not mapped. All outcomes are simulated, none observed.",
-        restoration_outcomes_observed=False, soil_model_heldout_skill=skill, sensitivity_to_water_allocation=sens, mc_draws=mc,
+        water_supply=(dict(method="Irrigation water is limited to the renewable water generated locally: annual climatic surplus P - AET from TerraClimate 2011-2020 (mean; year-to-year sd is the uncertainty), 1 mm = 10 m3/ha, taken at ~4 km and compared with each scenario's net irrigation requirement. Effective rainfall is already inside the requirement (net of rain), so no water is counted twice and neighbouring cells are never pooled.",
+                           evidence="observed climate; supply and deficit are simulated", resolution_m=4000,
+                           upper_bound="the surplus is an upper bound of locally capturable water (no capture or conveyance losses)",
+                           not_mapped=["groundwater storage and sustainable-abstraction limits", "fossil aquifers (e.g. Disi)", "national water transfers and canals", "treated wastewater plants", "dams and infrastructure distance", "water rights/licences"],
+                           reading="High feasibility means the best scenario's water need is met by local renewable water. Where the need exceeds it, feasibility drops and the water deficit (m3/ha/yr) is the amount that would have to come from sources not mapped here.")
+                      if water_cap is None else dict(method="uniform what-if allocation (legacy), not geographic")),
+        ui_banner="Feasibility is water-aware: it assumes irrigation can use only the renewable water generated locally (climatic surplus P - AET, ~4 km). External water (transfers, fossil groundwater, treated wastewater) is not mapped, so the deficit shown is what would have to come from elsewhere. All outcomes are simulated, none observed.",
+        restoration_outcomes_observed=False, soil_model_heldout_skill=skill, sensitivity_to_water_allocation=(sens if water_cap is not None else {}), mc_draws=mc,
         evidence_classes=EVIDENCE_SUMMARY, effective_resolution_m=config.EFFECTIVE_RESOLUTION_M, grid_resolution_m=config.RES,
         climate_window="TerraClimate 2011-2020 (10 years)", current_class_source=("STAND-IN rule map (not Model 1)" if standin else "Model 1 suitability outputs"), model1_run=m1,
         soilgrids_arid_rmse=dict(ph=0.34, soc_pct=0.55, sand_pct=10.8, clay_pct=9.2, note="SOC has no regional skill (R2~0); depth to bedrock capped at 200 cm and uninformative"))
@@ -165,7 +171,8 @@ def write_all(out: Path, region_id: str, rt: dict, cell: dict | None, feats: lis
                             water_cap_m3_ha_yr=water_cap, current_class_basis=common["current_class_basis"])
     summ["notes"] = ["Areas in equal-area EPSG:6933; 1 dunum = 1,000 m2 = 0.1 ha.", "Class 5 (restricted) polygons are never restorable: reported as not_feasible with limiting factor 'restriction'.",
                      "All feasibility, post-restoration class, water requirement and time-to-effect values are simulated; none is an observed restoration result.",
-                     "Feasibility is conditional on a reference water allocation (scenario condition) and on water SOURCE availability, which is not mapped."]
+                     ("Feasibility is conditional on a uniform what-if water allocation (scenario condition), not on mapped water." if water_cap is not None else
+                      "Feasibility uses the renewable water generated locally (climatic surplus P - AET, ~4 km); water SOURCES (groundwater limits, fossil aquifers, transfers, wastewater, dams) are not mapped.")]
     summ["source_studies"] = {k: dict(citation=SOURCES[k]["citation"], url=SOURCES[k]["url"], verification=SOURCES[k]["level"], verified_detail=SOURCES[k]["verified"]) for k in sorted(STUDIES_USED)}
     (out / "summary.json").write_text(json.dumps(summ, indent=1))
     res["paths"]["summary.json"] = "summary.json"
@@ -177,7 +184,7 @@ def write_all(out: Path, region_id: str, rt: dict, cell: dict | None, feats: lis
             ck[k] = dict(file=f"checkpoints/{v['file']}", sha256=v["sha256"], features=v["features"], trained_on_n=v["trained_on_n"])
     except Exception:
         pass
-    params = {k: dict(min=float(np.min(v)), max=float(np.max(v)), mean=float(np.mean(v))) for k, v in E["params"].items()}
+    params = {k: dict(min=float(np.min(v)), max=float(np.max(v)), mean=float(np.mean(v))) for k, v in E["params"].items() if v is not None}
     rm = dict(model_version=config.MODEL_VERSION, region=region_id, created=common["created"], seed=seed, runtime_seconds=round(seconds, 1),
               checkpoints=ck, grid=dict(crs=g.crs, resolution_m=g.res, width=g.width, height=g.height), effective_resolution_m=config.EFFECTIVE_RESOLUTION_M,
               current_class_basis=common["current_class_basis"], model1_inputs=(rel(Path(suit_dir)) if suit_dir else None), caveats=caveats, model1_run=m1,
