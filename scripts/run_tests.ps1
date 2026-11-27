@@ -6,7 +6,7 @@ $py = Join-Path $root '.venv\Scripts\python.exe'
 if (-not (Test-Path $py)) { $py = 'python' }
 $env:PYTHONPATH = $root
 $env:CUDA_VISIBLE_DEVICES = ''
-& $py -m pytest backend/tests models/suitability/tests models/restoration/tests -q
+& $py -m pytest backend/tests models/suitability/tests models/restoration/tests tests -q
 $rc = $LASTEXITCODE
 if (-not $SkipWeb) {
     Push-Location web

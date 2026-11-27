@@ -1,0 +1,289 @@
+{
+ "region": "jo-tafilah",
+ "caveats": {
+  "assumed_water_allocation_m3_ha_yr": 8000.0,
+  "feasibility_is_conditional_on_water": true,
+  "water_source_availability_mapped": false,
+  "ui_banner": "Feasibility = technically feasible IF the assumed water allocation is supplied; water source, groundwater and wastewater availability are not mapped. All outcomes are simulated, none observed.",
+  "restoration_outcomes_observed": false,
+  "soil_model_heldout_skill": {
+   "ece": {
+    "target": "log10(ECe dS/m)",
+    "heldout_region": "Levant + Arabian peninsula (lon 30-50, lat 20-38)",
+    "n_heldout": 138,
+    "n_heldout_blocks": 9,
+    "r2_heldout": 0.00950528205903356,
+    "r2_heldout_ci95": [
+     -0.08342793661258412,
+     0.274917310118949
+    ],
+    "rmse_heldout_t": 0.628374882397187,
+    "r2_block_cv": 0.22118173548995856,
+    "conformal_pi90_coverage_cv": 0.9007987910189983,
+    "conformal_pi90_coverage_heldout": 0.8695652173913043,
+    "baseline_global_median_r2_heldout": -0.8996731005137362,
+    "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
+   },
+   "esp": {
+    "target": "log1p(ESP %)",
+    "heldout_region": "Levant + Arabian peninsula (lon 30-50, lat 20-38)",
+    "n_heldout": 74,
+    "n_heldout_blocks": 6,
+    "r2_heldout": 0.008361683689086963,
+    "r2_heldout_ci95": [
+     -0.9943962121179614,
+     0.13010319890494695
+    ],
+    "rmse_heldout_t": 1.0713787261107142,
+    "r2_block_cv": 0.18257216729553682,
+    "conformal_pi90_coverage_cv": 0.9007421150278293,
+    "conformal_pi90_coverage_heldout": 0.9054054054054054,
+    "baseline_global_median_r2_heldout": -1.1318411001663824,
+    "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
+   }
+  },
+  "sensitivity_to_water_allocation": {
+   "baseline (water 8000 m3/ha/yr)": {
+    "mean_score": 0.877,
+    "class_flip_rate": 0.0
+   },
+   "water allocation 3000 m3/ha/yr": {
+    "mean_score": 0.027,
+    "class_flip_rate": 0.995
+   },
+   "water allocation 5000 m3/ha/yr": {
+    "mean_score": 0.506,
+    "class_flip_rate": 0.799
+   },
+   "water allocation 12000 m3/ha/yr": {
+    "mean_score": 0.907,
+    "class_flip_rate": 0.005
+   },
+   "water allocation 20000 m3/ha/yr": {
+    "mean_score": 0.925,
+    "class_flip_rate": 0.006
+   }
+  },
+  "mc_draws": {
+   "raster_outer_param_draws": 16,
+   "raster_inner_input_draws": 4,
+   "raster_draws_per_cell": 64,
+   "raster_cells_evaluated": 24583,
+   "polygon_outer_param_draws": 32,
+   "polygon_inner_input_draws": 6,
+   "polygon_draws_per_polygon": 192,
+   "n_polygons": 417,
+   "seed": 20261122
+  },
+  "evidence_classes": {
+   "observed": [
+    "slope and elevation (Copernicus GLO-30 DEM)",
+    "climate normals and interannual rainfall (TerraClimate 2011-2020, gridded climate product)",
+    "crop/ESP/salinity tolerance tables are literature (see expert_rule)"
+   ],
+   "ml_predicted": [
+    "ECe and ESP (own LightGBM trained on measured WoSIS/Hassani points, conformal intervals)",
+    "pH, SOC, texture, coarse fragments, bulk density, CEC (SoilGrids 2.0, third party)",
+    "depth to bedrock (SoilGrids 2017, third party, capped 200 cm)"
+   ],
+   "expert_rule": [
+    "Maas-Hoffman salinity response (FAO IDP29 Table 4), ESP tolerance classes (FAO SB39), pH/SOC/coarse-fragment/texture/depth/slope response curves (assumed shapes)",
+    "relative erosion index (RUSLE-type structure)",
+    "FAO suitability class boundaries on relative yield (S1>=0.8, S2 0.6-0.8, S3 0.4-0.6 [assumed], N<0.4)"
+   ],
+   "simulated": [
+    "intervention outcomes (leaching, gypsum, organic amendment, terracing, water harvesting)",
+    "post-restoration relative yield, class and water requirement",
+    "feasibility score and interval (Monte-Carlo)"
+   ]
+  },
+  "effective_resolution_m": {
+   "soil_ph_soc_texture": 250,
+   "salinity_sodicity": 1000,
+   "terrain_slope": 30,
+   "climate_water_demand": 4000,
+   "overall": 4000
+  },
+  "grid_resolution_m": 250.0,
+  "climate_window": "TerraClimate 2011-2020 (10 years)",
+  "current_class_source": "Model 1 suitability outputs",
+  "model1_run": {
+   "model_version": "m1-0.1.0",
+   "checkpoint_sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3",
+   "created_at": "2026-11-27T13:25:15Z",
+   "grid_resolution_m": 100.0,
+   "effective_resolution_m": 1000,
+   "confidence_method": "Monte-Carlo agreement: share of 24 draws (SoilGrids/SOTWIS/terrain/climate inputs perturbed by documented error models, ML ensemble member and fusion thresholds resampled) that reproduce the central class. It measures robustness to input uncertainty, NOT validated map accuracy.",
+   "polygons": "models/suitability/outputs/jo-tafilah/polygons.geojson"
+  },
+  "soilgrids_arid_rmse": {
+   "ph": 0.34,
+   "soc_pct": 0.55,
+   "sand_pct": 10.8,
+   "clay_pct": 9.2,
+   "note": "SOC has no regional skill (R2~0); depth to bedrock capped at 200 cm and uninformative"
+  }
+ },
+ "raster_cells": {
+  "not_feasible": {
+   "cells": 6382,
+   "area_ha": 39887.5,
+   "area_dunum": 398875.0,
+   "share": 0.2125
+  },
+  "low": {
+   "cells": 440,
+   "area_ha": 2750.0,
+   "area_dunum": 27500.0,
+   "share": 0.0147
+  },
+  "moderate": {
+   "cells": 1519,
+   "area_ha": 9493.8,
+   "area_dunum": 94938.0,
+   "share": 0.0506
+  },
+  "high": {
+   "cells": 21687,
+   "area_ha": 135543.8,
+   "area_dunum": 1355438.0,
+   "share": 0.7222
+  }
+ },
+ "raster_best_scenario_cells": {
+  "irr_fresh": 5396,
+  "irr_tww": 1393,
+  "irr_brackish": 197,
+  "rainfed_wh": 0,
+  "terraced_irr": 17597
+ },
+ "raster_post_class_cells": {
+  "1": 17212,
+  "2": 4929,
+  "3": 1,
+  "4": 2441
+ },
+ "raster_class5_not_feasible_cells": 5445,
+ "polygons_by_feasibility": {
+  "not_feasible": {
+   "polygon_count": 100,
+   "area_ha": 34070.0,
+   "area_dunum": 340700.0,
+   "share": 0.182
+  },
+  "low": {
+   "polygon_count": 0,
+   "area_ha": 0.0,
+   "area_dunum": 0.0,
+   "share": 0.0
+  },
+  "moderate": {
+   "polygon_count": 1,
+   "area_ha": 833.0,
+   "area_dunum": 8330.0,
+   "share": 0.0044
+  },
+  "high": {
+   "polygon_count": 316,
+   "area_ha": 152344.0,
+   "area_dunum": 1523440.0,
+   "share": 0.8136
+  }
+ },
+ "polygons_with_severe_limiting_factor(>=0.3)": {
+  "water_availability": 417,
+  "slope": 325,
+  "erosion": 272,
+  "restriction": 100
+ },
+ "polygons_by_best_scenario": {
+  "terraced_irr": 311,
+  "irr_fresh": 105,
+  "irr_tww": 1
+ },
+ "headline": {
+  "n_polygons": 417,
+  "by_class": {
+   "not_feasible": 100,
+   "low": 0,
+   "moderate": 1,
+   "high": 316
+  },
+  "area_ha_by_class": {
+   "not_feasible": 34070.0,
+   "low": 0.0,
+   "moderate": 833.0,
+   "high": 152344.0
+  },
+  "water_cap_m3_ha_yr": 8000.0,
+  "current_class_basis": "Model 1 suitability.tif + polygons.geojson"
+ },
+ "notes": [
+  "Areas in equal-area EPSG:6933; 1 dunum = 1,000 m2 = 0.1 ha.",
+  "Class 5 (restricted) polygons are never restorable: reported as not_feasible with limiting factor 'restriction'.",
+  "All feasibility, post-restoration class, water requirement and time-to-effect values are simulated; none is an observed restoration result.",
+  "Feasibility is conditional on a reference water allocation (scenario condition) and on water SOURCE availability, which is not mapped."
+ ],
+ "source_studies": {
+  "BATJES_2024": {
+   "citation": "Batjes, N.H., Calisto, L. & de Sousa, L.M. (2024). Providing quality-assessed and standardised soil data to support global mapping and modelling (WoSIS snapshot 2023). Earth Syst. Sci. Data 16:4735-4765.",
+   "url": "https://doi.org/10.5194/essd-16-4735-2024",
+   "verification": "abstract",
+   "verified_detail": "Article landing page read: ~228k profiles, EC (ELCOSP = saturated paste) among standardised properties, per-record licences (CC BY / CC BY-NC / public domain), positional uncertainty ~100 m for 86 % of profiles, purposive (non-probabilistic) sampling."
+  },
+  "FAO56": {
+   "citation": "Allen, R.G., Pereira, L.S., Raes, D. & Smith, M. (1998). Crop evapotranspiration - Guidelines for computing crop water requirements. FAO Irrigation and Drainage Paper 56.",
+   "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+   "verification": "full_text",
+   "verified_detail": "Read ch.3 (Hargreaves eq. 52: ETo = 0.0023 (Tmean+17.8)(Tmax-Tmin)^0.5 Ra), ch.6 Table 11 (stage lengths) and Table 12 (Kc ini/mid/end) rows used in crops.py."
+  },
+  "FAO_IDP29": {
+   "citation": "Ayers, R.S. & Westcot, D.W. (1985). Water quality for agriculture. FAO Irrigation and Drainage Paper 29 Rev. 1.",
+   "url": "https://www.fao.org/4/t0234e/t0234e00.htm",
+   "verification": "full_text",
+   "verified_detail": "Read ch.2-3 (HTML): Table 4 crop ECe/ECw yield-potential values (100/90/75/50/0 %), Y = 100 - b(ECe - a) (eq. 10), leaching requirement worked example (ECw 1.2, ECe 2.5 -> LR 0.10; ECe 1.7 -> 0.16), ECe = 1.5 ECw at LF 0.15-0.20, reclamation leaching: 70-80 % (continuous ponding) / 80-90 % (intermittent/sprinkler) salt removal per depth of water equal to soil depth; ECe < 10-12 dS/m needs only 10-20 cm pre-plant irrigation for barley/cotton; gypsum equivalent 86 kg per me/L per 1000 m3."
+  },
+  "FAO_SB39": {
+   "citation": "Abrol, I.P., Yadav, J.S.P. & Massoud, F.I. (1988). Salt-affected soils and their management. FAO Soils Bulletin 39.",
+   "url": "https://www.fao.org/4/x5871e/x5871e00.htm",
+   "verification": "full_text",
+   "verified_detail": "Read ch.4: ESP 15 = sodic limit (Richards 1954), saturation-paste pH 8.2 diagnostic, Table 32 (Abrol 1982) crop ESP tolerance classes (yields seriously affected above ESP ~55 tolerant / ~35 semi-tolerant / ~10 sensitive), Table 33 (Pearson 1960), Table 23 hazard classes, gypsum stoichiometry worked example (0.5 cmol Ca/kg, 15 cm -> 1.96 t/ha pure gypsum)."
+  },
+  "FAO_SB55": {
+   "citation": "FAO (1985). Guidelines: Land evaluation for irrigated agriculture. FAO Soils Bulletin 55.",
+   "url": "https://www.fao.org/3/x5648e/x5648e00.htm",
+   "verification": "full_text",
+   "verified_detail": "Read ch.2 and ch.4: land suitability classes S1/S2/S3/N1/N2, relative yield as land productivity index ('top of S2 taken as 80 %, S3 as 60 %'); class-determining factors incl. effective soil depth, stoniness, ESP/salinity, slope, drainage, water supply. The 40 % lower bound of S3 used here is NOT stated in the text (assumption, sensitivity-tested)."
+  },
+  "FAO_WH91": {
+   "citation": "Critchley, W. & Siegert, K. (1991). A manual for the design and construction of water harvesting schemes for plant production. FAO AGL/MISC/17/91.",
+   "url": "https://www.fao.org/3/u3160e/u3160e00.htm",
+   "verification": "full_text",
+   "verified_detail": "Read ch.3-4: WATER HARVESTED = CA x design rainfall x runoff coeff. x efficiency; C:CA = (WR - DR)/(DR x K x EFF); K usually 0.1-0.5; EFF 0.5-0.75; design rainfall at 67-75 % exceedance; rainfall variability (mean 200-300 mm: 40-200 % of mean in 19/20 yr; 100 mm: 30-350 %); microcatchment C:CA 2-3:1 guideline."
+  },
+  "GRAVUER_2019": {
+   "citation": "Gravuer, K., Gennet, S. & Throop, H.L. (2019). Organic amendment additions to rangelands: a meta-analysis of multiple ecosystem outcomes. Global Change Biology 25:1152-1170.",
+   "url": "https://doi.org/10.1111/gcb.14535",
+   "verification": "abstract",
+   "verified_detail": "Abstract read via Europe PMC (PMC6849820): 92 studies in arid/semiarid/Mediterranean rangelands; amendments on average increased soil carbon, water-holding capacity, ANPP; decreased runoff; short study durations (median 1-2 yr). No numeric effect size was read -> used only qualitatively."
+  },
+  "HASSANI_2020": {
+   "citation": "Hassani, A., Azapagic, A. & Shokri, N. (2020). Predicting long-term dynamics of soil salinity and sodicity on a global scale. PNAS 117(52):33017-33027.",
+   "url": "https://data.mendeley.com/datasets/v9mgbmtnf2/1",
+   "verification": "abstract",
+   "verified_detail": "Dataset record read (Mendeley Data, CC BY 4.0, DOI 10.17632/v9mgbmtnf2.1): global ECe/ESP 0-30 cm maps 1980-2018, ~1 km, ML-based; file list/sizes read via public API. Paper not read in full."
+  },
+  "MAAS_HOFFMAN_1977": {
+   "citation": "Maas, E.V. & Hoffman, G.J. (1977). Crop salt tolerance - current assessment. J. Irrigation and Drainage Div. ASCE 103(IR2):115-134.",
+   "url": "https://doi.org/10.1061/jrcea4.0001137",
+   "verification": "crossref",
+   "verified_detail": "Crossref record resolved (title, authors Maas/Hoffman, journal, 1977). Numerical thresholds are taken from the FAO_IDP29 Table 4 adaptation, not from the paper."
+  },
+  "SWATPLUS_K": {
+   "citation": "SWAT+ Input/Output documentation, 'Soil Erodibility Factor' (equations of Williams, J.R. 1995, EPIC).",
+   "url": "https://swatplus.gitbook.io/io-docs/sediment/musle/soil-erodibility-factor",
+   "verification": "full_text",
+   "verified_detail": "Read the four EPIC factor equations f_csand, f_cl-si, f_orgc, f_hisand (as transcribed in erosion.py). Williams (1995) itself was not read."
+  }
+ }
+}

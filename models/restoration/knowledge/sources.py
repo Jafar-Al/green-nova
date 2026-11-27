@@ -1,7 +1,7 @@
 """Registry of the studies/documents the restoration engine draws on.
 
 Rule: an entry is only listed with `verified` text that says exactly what was checked and how. Nothing is cited from memory.
-`level`:  full_text   = the cited numbers/equations were read in the publisher's/FAO's document by the model2 agent
+`level`:  full_text   = the cited numbers/equations were read in the publisher's/FAO's document by the authors
           abstract    = only the abstract/bibliographic record was read (qualitative statements only are used)
           crossref    = bibliographic record resolved in Crossref (existence + authors + venue + year), content not read
           pending     = not yet verified (not used for any number)

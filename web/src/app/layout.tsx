@@ -18,7 +18,7 @@ const mono = JetBrains_Mono({
 });
 
 const DESCRIPTION =
-  "GREEN NOVA AI maps where land is suitable for agriculture today and where degraded land could be restored, from satellite imagery, with the evidence behind every number shown. Starting with Ma’an, Jordan.";
+  "GREEN NOVA AI maps where land is suitable for agriculture today and where degraded land could be restored, from satellite imagery, with the evidence behind every number shown. Covers all 12 governorates of Jordan.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -27,9 +27,13 @@ RUNTIME_LAYERS = [n for n in F.INTRINSIC if n != "awc_ptf"] + F.SD_LAYERS + [
 
 
 def runtime_root():
+    """Folder holding the per-region <region>/features.npy windows.
+
+    Override with GREEN_NOVA_M1_RUNTIME (deliberately different from the backend's GREEN_NOVA_RUNTIME, which is the job-store folder)."""
     import os
-    return config.DATA_ROOT / "runtime" / "model1" if "GREEN_NOVA_RUNTIME" not in os.environ else \
-        __import__("pathlib").Path(os.environ["GREEN_NOVA_RUNTIME"])
+    from pathlib import Path
+    v = os.environ.get("GREEN_NOVA_M1_RUNTIME")
+    return Path(v) if v else config.DATA_ROOT / "runtime" / "model1"
 
 
 def package(region_id: str):

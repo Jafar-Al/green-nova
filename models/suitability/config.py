@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_ROOT = Path(os.environ.get("GREEN_NOVA_DATA", r"C:\GreenNovaData"))
+DATA_ROOT = Path(os.environ.get("GREEN_NOVA_DATA") or Path.home() / "GreenNovaData")   # raw data, caches, runtime windows: outside the repo
 RAW = DATA_ROOT / "raw"
 CACHE = DATA_ROOT / "cache"
 COV = CACHE / "covariates"            # shared with model2 (manifest.json lives here)
@@ -45,10 +45,23 @@ HA_PER_CELL = (RES * RES) / 10_000.0       # 1.0 for 100 m
 DUNUM_PER_HA = 10.0                         # 1 dunum = 1,000 m2 = 0.1 ha
 
 # ---------------------------------------------------------------- regions
-# adm1 shapeName in geoBoundaries gbOpen JOR ADM1 (2006 vintage, Wikimedia-derived; coarse vertices)
-REGIONS = {
-    "jo-maan": {"name": "Ma'an", "country": "JO", "adm1": "Ma'an", "iso": "JO-MN"},
-}
+# Governorates (ADM1) come from the canonical boundary file (geoBoundaries gbOpen JOR ADM1, 2006 vintage, Wikimedia-derived;
+# coarse vertices), so every governorate in regions/jordan_adm1.geojson is a valid region id (e.g. "jo-maan", "jo-irbid").
+def _load_registry() -> dict:
+    import json
+    try:
+        feats = json.loads(REGIONS_GEOJSON.read_text(encoding="utf-8"))["features"]
+    except (FileNotFoundError, KeyError, ValueError):
+        return {"jo-maan": {"name": "Ma'an", "country": "JO", "adm1": "Ma'an", "iso": "JO-MN"}}
+    out = {}
+    for f in feats:
+        p = f.get("properties", {})
+        if p.get("region_id"):
+            out[p["region_id"]] = {"name": p.get("name"), "country": p.get("country", "JO"), "adm1": p.get("name"), "iso": p.get("iso")}
+    return out
+
+
+REGIONS = _load_registry()
 # Training/validation geography = all of Jordan (12 governorates); evaluation targets include jo-maan.
 TRAIN_COUNTRY = "JO"
 

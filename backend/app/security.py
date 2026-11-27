@@ -1,7 +1,7 @@
 """Security middleware: headers, body-size limit, per-IP rate limit, client-ip resolution.
 
 The API listens on 127.0.0.1 only and is called by the Next.js BFF. The BFF forwards the real visitor address in X-GN-Client-IP
-(taken from CF-Connecting-IP behind the Cloudflare Tunnel); that header is honoured ONLY when the TCP peer is loopback.
+(taken from CF-Connecting-IP / X-Forwarded-For set by the reverse proxy); that header is honoured ONLY when the TCP peer is loopback.
 """
 from __future__ import annotations
 

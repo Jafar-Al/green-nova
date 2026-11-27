@@ -2,8 +2,8 @@ import { IS_DEMO_MODE } from "@/lib/config";
 import { Disclosure } from "@/components/ui/primitives";
 
 /**
- * Mandatory caveats on every REAL Model 2 view (owner/model2 requirement). Not shown for demonstration data, which has its own marker.
- * Static text; the numbers named here are the documented defaults in docs/handoff/model2.md.
+ * Mandatory caveats on every REAL Model 2 view (product requirement). Not shown for demonstration data, which has its own marker.
+ * Static text; the numbers named here are the documented defaults in docs/MODEL2_RESTORATION.md.
  */
 export function Model2Caveats({ className = "" }: { className?: string }) {
   if (IS_DEMO_MODE) return null;

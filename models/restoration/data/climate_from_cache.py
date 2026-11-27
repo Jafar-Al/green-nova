@@ -26,4 +26,7 @@ def build(region_id="jo-maan", pad=0.15):
     np.savez_compressed(p, **out)
     print("saved", p.name, {k: v.shape for k, v in out.items()})
 if __name__ == "__main__":
-    build()
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--region", default="jo-maan")
+    build(ap.parse_args().region)

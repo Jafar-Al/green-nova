@@ -5,7 +5,8 @@ import { callUpstream } from "@/lib/bff/upstream";
 /**
  * Server-side BFF to the internal FastAPI service (BACKEND_URL, server-only, loopback only).
  * Not a proxy: every request must match an entry in lib/bff/allowlist.ts, which rebuilds the upstream path from validated parts.
- * The visitor address (CF-Connecting-IP behind the Cloudflare Tunnel) is forwarded in X-GN-Client-IP for rate limiting.
+ * The visitor address (CF-Connecting-IP / X-Forwarded-For, as set by the reverse proxy in front of the site) is forwarded in
+ * X-GN-Client-IP for rate limiting. Deploy behind a proxy that overwrites these headers; without one they are client-controlled.
  * Upstream calls use non-pooled loopback connections (lib/bff/upstream.ts) so uvicorn's 5 s keep-alive can never hand us a dead socket.
  */
 export const dynamic = "force-dynamic";

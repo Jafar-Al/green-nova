@@ -1,7 +1,7 @@
 import type { StyleSpecification } from "maplibre-gl";
 import { BASEMAP } from "@/lib/config";
 
-/** Resolve a tile template against the page origin when it is a root-relative path (tunnel- and localhost-safe). */
+/** Resolve a tile template against the page origin when it is a root-relative path (host- and localhost-safe). */
 export function resolveTileUrl(template: string): string {
   if (typeof window === "undefined") return template;
   return template.startsWith("/") ? `${window.location.origin}${template}` : template;

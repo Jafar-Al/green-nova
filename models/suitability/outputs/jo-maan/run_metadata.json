@@ -107,7 +107,7 @@
   }
  ],
  "acquisition_date_range": {
-  "sentinel2": "not used by v0.1 checkpoint (see handoff)",
+  "sentinel2": "not used by v0.1 checkpoint (see docs/MODEL1_SUITABILITY.md)",
   "dem": "2010-2015",
   "worldcover": "2020-2021",
   "io_lulc": "2017-2023",
@@ -258,6 +258,6 @@
    }
   ],
   "not_done": "Zarqa+Aqaba, central and northern held-out groups, GAEZ comparison, EuroSAT ablation, CNN, Sentinel imagery features",
-  "full_report": "docs/handoff/model1.md"
+  "full_report": "docs/MODEL1_SUITABILITY.md"
  }
 }

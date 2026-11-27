@@ -33,7 +33,7 @@ const STEPS = [
 
 const CAPABILITIES: [string, string][] = [
   ["Satellite map", "A real Sentinel-2 true-colour basemap with boundary, polygons, legend, scale and coordinates."],
-  ["Governorate-wide analysis", "A whole region is analysed, not a single uploaded image. Jordan first, Ma’an as the starting region."],
+  ["Governorate-wide analysis", "A whole governorate is analysed, not a single uploaded image. All 12 governorates of Jordan are covered."],
   ["Polygon inspection", "Click any land unit: class, area in hectares and dunums, confidence and the factors behind it."],
   ["Evidence labels", "Observed, ML-predicted, expert rule or simulated: stated on every factor, value and scenario."],
   ["Honest uncertainty", "Confidence with its definition, feasibility intervals, resolution limits and stated limitations."],
@@ -63,7 +63,7 @@ export default function Landing() {
     "@type": "WebSite",
     name: SITE_NAME,
     url: SITE_URL,
-    description: "Satellite land intelligence for agriculture: land suitability and restoration potential, starting with Ma’an, Jordan.",
+    description: "Satellite land intelligence for agriculture: land suitability and restoration potential across all 12 governorates of Jordan.",
   };
   return (
     <>

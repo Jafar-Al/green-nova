@@ -1,0 +1,27 @@
+{
+ "region": "jo-aqaba",
+ "built": "2026-11-27T16:28:47",
+ "model_version": "restoration-0.1.0",
+ "layers": {
+  "slope_deg": "Copernicus GLO-30 -> 50 m slope -> 250 m mean (observed)",
+  "ph": "SoilGrids 2.0 phh2o depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "soc_pct": "SoilGrids 2.0 soc depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "sand": "SoilGrids 2.0 sand depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "clay": "SoilGrids 2.0 clay depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "silt": "SoilGrids 2.0 silt depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "cfvo": "SoilGrids 2.0 cfvo depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "cec": "SoilGrids 2.0 cec depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "bd": "SoilGrids 2.0 bdod depths ['0-5cm', '5-15cm', '15-30cm'] weighted to 0-30 cm (ml_predicted, third party)",
+  "depth_cm": "SoilGrids 2017 BDRICM, capped at 200 cm (ml_predicted, third party)",
+  "ece": "own LightGBM (ece) on 1 km features, replicated to 250 m grid (effective resolution 1 km; ml_predicted)",
+  "esp": "own LightGBM (esp) on 1 km features, replicated to 250 m grid (effective resolution 1 km; ml_predicted)"
+ },
+ "climate": "TerraClimate 2011-2020 monthly climatology (ppt, pet = FAO-56 PM ETo), annual rainfall series for design rainfall (33rd percentile), native ~4 km",
+ "effective_resolution_m": {
+  "soil_ph_soc_texture": 250,
+  "salinity_sodicity": 1000,
+  "terrain_slope": 30,
+  "climate_water_demand": 4000,
+  "overall": 4000
+ }
+}

@@ -8,7 +8,8 @@
 *.token
 kaggle.json
 credentials*
-.claude/
+
+
 
 # Python
 __pycache__/
@@ -23,15 +24,13 @@ node_modules/
 .next/
 *.tsbuildinfo
 
-# Local runtime state, logs, caches, raw data (large; see HANDOFF_REPORT.md for how to rebuild)
+# Local runtime state, logs, caches, raw data (large; see docs/DATA_SOURCES.md for how to rebuild)
 logs/
 *.log
 *.sqlite
 jobs/
 raw/
 cache/
-GreenNovaData/
-GreenNovaRun/
 models/*/outputs_tmp/
 models/*/outputs/*_new/
 models/*/scratch/

@@ -1,18 +1,18 @@
 import type { NextConfig } from "next";
 
 /**
- * Fixed topology (owner instruction, docs/ORCHESTRATION.md "FIXED ports, domain and tunnel"):
- *  - the frontend always listens on 0.0.0.0:3000 (explicit in every npm script);
- *  - public host greennova.dosteam.org reaches it through the owner's Cloudflare Tunnel (HTTPS terminates at Cloudflare);
- *  - FastAPI (Phase C) is internal at 127.0.0.1:8000 and is only ever called server-side (BFF route handlers).
- * No rewrites/proxies exist in Phase A. Do not add a blanket /api/* rewrite.
+ * Topology:
+ *  - the frontend listens on 0.0.0.0:3000 (explicit in every npm script; terminate TLS in your own reverse proxy / platform);
+ *  - FastAPI is internal (127.0.0.1:8000 by default) and is only ever called server-side by the BFF route handlers
+ *    (src/app/api/gn). Do not add a blanket /api/* rewrite: the BFF is an explicit allow-list.
  */
-const PUBLIC_HOST = (process.env.GREEN_NOVA_DOMAIN || "greennova.dosteam.org").replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+// Extra hostnames allowed to use the dev server (HMR websocket, /_next/* dev resources), e.g. a LAN name: ALLOWED_DEV_ORIGINS=dev.example.lan
+const EXTRA_DEV_ORIGINS = (process.env.ALLOWED_DEV_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
 const isProd = process.env.NODE_ENV === "production";
 
 /**
  * Content-Security-Policy (production only; the dev server needs eval for HMR).
- * - 'unsafe-inline' scripts: Next injects inline bootstrap/flight scripts; a nonce needs middleware (Phase C hardening item).
+ * - 'unsafe-inline' scripts: Next injects inline bootstrap/flight scripts; a nonce needs middleware (hardening item).
  * - worker-src blob: and img-src blob:/data: are required by MapLibre GL (tile decode worker, hatch pattern).
  * - If NEXT_PUBLIC_SATELLITE_TILE_URL points at another origin, add that origin to img-src and connect-src.
  */
@@ -40,8 +40,7 @@ const nextConfig: NextConfig = {
   // Generic path: plain `npm run build` + `npm start` (next start). Set GN_STANDALONE=1 at build time for a self-contained
   // folder (`node server.js` with .next/static and public beside it): see scripts/assemble-standalone.mjs.
   ...(process.env.GN_STANDALONE === "1" ? { output: "standalone" as const } : {}),
-  // Lets the dev server (HMR websocket, /_next/* dev resources) work when browsed through the tunnel host.
-  allowedDevOrigins: [PUBLIC_HOST, "localhost", "127.0.0.1"],
+  allowedDevOrigins: ["localhost", "127.0.0.1", ...EXTRA_DEV_ORIGINS],
   async headers() {
     return [
       {
@@ -56,7 +55,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // HTML must revalidate so a redeploy is visible immediately, also when a CDN sits in front of the tunnel.
+        // HTML must revalidate so a redeploy is visible immediately, also when a CDN or reverse proxy sits in front.
         source: "/((?!_next/static|_next/image|img|tiles|data|icon.svg).*)",
         headers: [{ key: "Cache-Control", value: "public, max-age=0, must-revalidate" }],
       },

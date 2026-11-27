@@ -1,0 +1,220 @@
+{
+ "model_version": "m1-0.1.0",
+ "package_version": "0.1.0",
+ "checkpoint_sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3",
+ "region_id": "jo-aqaba",
+ "created_at": "2026-11-27T13:28:38Z",
+ "device_requested": "cpu",
+ "device_used": "cpu",
+ "working_crs": "EPSG:6933",
+ "grid_resolution_m": 100.0,
+ "effective_resolution_m": 1000,
+ "effective_resolution_note": "classes 1-4 are driven by climate (1-4 km), SOTWIS 1:500 000 map units and 250 m SoilGrids; the 100 m grid is a sampling grid. Class 5 uses vector restrictions at their mapped precision.",
+ "raster_files": {
+  "suitability": "uint8, 0=nodata, 1..5 classes (after MMU sieve)",
+  "confidence": "uint8 0-100, nodata 255",
+  "class_probabilities": "uint8 percent, 5 bands",
+  "suitability_wgs84": "EPSG:4326 preview, ~0.001 deg"
+ },
+ "confidence_method": "Monte-Carlo agreement: share of 24 draws (SoilGrids/SOTWIS/terrain/climate inputs perturbed by documented error models, ML ensemble member and fusion thresholds resampled) that reproduce the central class. It measures robustness to input uncertainty, NOT validated map accuracy.",
+ "label_basis": {
+  "1": "rule-derived (FAO-style limiting-factor evaluation) + ML cultivation-likelihood evidence; never field-verified",
+  "2": "rule-derived + ML evidence; includes land observed under cultivation in 2021 (observed, WorldCover+IO LULC)",
+  "3": "rule-derived: reversible/partially reversible severe limitation(s); feasibility NOT assessed here (see Model 2)",
+  "4": "rule-derived: irreversible limitation (steepness, stoniness, hyper-aridity <100 mm/yr, gypsic, temperature) or ML-unsupported",
+  "5": "observed/mapped restrictions (OpenStreetMap protected/military/quarry/cemetery/built-up/airport/water/heritage); NOT WDPA/cadastre"
+ },
+ "data_sources": [
+  {
+   "name": "Copernicus DEM GLO-30",
+   "role": "covariate (slope, terrain)",
+   "vintage": "2010-2015 acquisitions, 2021 release",
+   "resolution_m": 30,
+   "license": "Copernicus free and open",
+   "url": "https://planetarycomputer.microsoft.com/dataset/cop-dem-glo-30"
+  },
+  {
+   "name": "ISRIC SoilGrids 2.0",
+   "role": "covariate (pH, SOC, texture, CEC, coarse fragments) - ML-predicted soil maps",
+   "vintage": "2020 release",
+   "resolution_m": 250,
+   "license": "CC BY 4.0",
+   "url": "https://www.isric.org/explore/soilgrids"
+  },
+  {
+   "name": "SOTWIS Jordan v1.0 (ISRIC)",
+   "role": "covariate (EC, ESP, gypsum, CaCO3, drainage) - legacy 1:500 000 survey units",
+   "vintage": "survey 1996, published 2013",
+   "resolution_m": 5000,
+   "license": "CC BY 3.0 per data hub (zip text: non-commercial) - flagged",
+   "url": "https://data.isric.org/geonetwork/srv/api/records/943d57ef-1eaf-4528-8508-9c81c1c2fcd3"
+  },
+  {
+   "name": "WorldClim 2.1 precipitation",
+   "role": "covariate (rainfall)",
+   "vintage": "1970-2000 normals",
+   "resolution_m": 1000,
+   "license": "CC BY 4.0",
+   "url": "https://www.worldclim.org/data/worldclim21.html"
+  },
+  {
+   "name": "TerraClimate",
+   "role": "covariate (PET, deficit, temperature; lapse-rate downscaled)",
+   "vintage": "2011-2020",
+   "resolution_m": 4000,
+   "license": "CC0 (per Planetary Computer)",
+   "url": "https://planetarycomputer.microsoft.com/dataset/terraclimate"
+  },
+  {
+   "name": "JRC Global Surface Water",
+   "role": "covariate (water occurrence)",
+   "vintage": "1984-2021",
+   "resolution_m": 30,
+   "license": "Copernicus free and open",
+   "url": "https://planetarycomputer.microsoft.com/dataset/jrc-gsw"
+  },
+  {
+   "name": "ESA WorldCover 2020 v100 / 2021 v200",
+   "role": "OBSERVED label (cropland) + exclusion (built-up, water)",
+   "vintage": "2020, 2021",
+   "resolution_m": 10,
+   "license": "CC BY 4.0",
+   "url": "https://planetarycomputer.microsoft.com/dataset/esa-worldcover"
+  },
+  {
+   "name": "Impact Observatory 10 m annual LULC v02",
+   "role": "OBSERVED label (cropland)",
+   "vintage": "2017, 2021, 2023",
+   "resolution_m": 10,
+   "license": "CC BY 4.0",
+   "url": "https://planetarycomputer.microsoft.com/dataset/io-lulc-annual-v02"
+  },
+  {
+   "name": "OpenStreetMap (Geofabrik Jordan extract)",
+   "role": "restriction masks (class 5)",
+   "vintage": "2026-11-21",
+   "resolution_m": null,
+   "license": "ODbL 1.0",
+   "url": "https://download.geofabrik.de/asia/jordan-latest-free.shp.zip"
+  },
+  {
+   "name": "geoBoundaries gbOpen JOR ADM1",
+   "role": "region boundaries",
+   "vintage": "2006 representation, build 2023",
+   "resolution_m": null,
+   "license": "CC BY 2.5",
+   "url": "https://www.geoboundaries.org/"
+  }
+ ],
+ "acquisition_date_range": {
+  "sentinel2": "not used by v0.1 checkpoint (see docs/MODEL1_SUITABILITY.md)",
+  "dem": "2010-2015",
+  "worldcover": "2020-2021",
+  "io_lulc": "2017-2023",
+  "climate": "1970-2000 (WorldClim), 2011-2020 (TerraClimate)",
+  "osm": "2026-11-21"
+ },
+ "mc_draws": 24,
+ "mmu_ha": 10.0,
+ "polygon_simplify_tolerance_m": 50,
+ "mc_error_model": "SoilGrids pH/SOC/sand/clay N(mu,(Q95-Q05)/3.29); other SoilGrids lognormal 0.25; SOTWIS lognormal 0.5; slope lognormal 0.15; rainfall lognormal 0.20; temperature N(0,1 degC)",
+ "fusion_thresholds": {
+  "P_HI": 0.5,
+  "P_LO": 0.01
+ },
+ "deterministic": true,
+ "notes": [
+  "Suitability classes are rule-derived (FAO-style) with ML and observed-cultivation evidence; no field-verified 5-class ground truth exists.",
+  "Irrigation water availability (groundwater, licences) is NOT modelled; class 4 in <100 mm/yr land means no rainfed option, not that irrigation is impossible.",
+  "Restrictions come from OpenStreetMap/WorldCover and are incomplete; always verify legal status before decisions."
+ ],
+ "runtime": {
+  "total_s": 26.4,
+  "ml_predict_s": 12.4,
+  "monte_carlo_s": 11.2,
+  "cells": 626235,
+  "peak_rss_mb": 502.5
+ },
+ "agreement_with_observed_cultivation": {
+  "observed_cultivated": {
+   "cells": 812,
+   "area_ha": 812.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 703,
+    "3": 0,
+    "4": 109,
+    "5": 0
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.8658,
+    "3": 0.0,
+    "4": 0.1342,
+    "5": 0.0
+   }
+  },
+  "observed_not_cultivated": {
+   "cells": 591691,
+   "area_ha": 591691.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 2,
+    "3": 1959,
+    "4": 589730,
+    "5": 0
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0033,
+    "4": 0.9967,
+    "5": 0.0
+   }
+  },
+  "excluded_or_ambiguous_label": {
+   "cells": 33732,
+   "area_ha": 33732.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 7,
+    "3": 418,
+    "4": 8242,
+    "5": 25065
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.0002,
+    "3": 0.0124,
+    "4": 0.2443,
+    "5": 0.7431
+   }
+  },
+  "observed_cultivated_without_override": {
+   "rule_only_share_by_class": {
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.0,
+    "4": 1.0
+   },
+   "rules_plus_ml_share_by_class": {
+    "1": 0.0,
+    "2": 0.0,
+    "3": 0.6268,
+    "4": 0.3732
+   },
+   "note": "classes these cells would get if the observed-cultivation override (class<=2) were switched off; this is the non-circular check"
+  },
+  "mean_ml_cultivation_probability": {
+   "observed_cultivated": 0.5133,
+   "observed_not_cultivated_sample": 0.0026,
+   "median_observed_cultivated": 0.545,
+   "median_observed_not_cultivated_sample": 0.0005,
+   "n_cultivated": 812,
+   "n_not_cultivated_sample": 200000,
+   "note": "in-sample for Jordan-wide training (Ma'an cells were in the final training set); the leave-governorate-out numbers are the held-out evidence"
+  },
+  "note_on_circularity": "The delivered map caps observed-cultivated cells at class 2 BY DESIGN (observed override), so the high class-2 share of observed_cultivated is partly by construction; see observed_cultivated_without_override for the rule/ML-only view.",
+  "reading": "86.6% of observed-cultivated cells fall in classes 1-2, 13.4% in classes 3-4, 0.0% in class 5. Labels: WorldCover-2021 AND IO-LULC-2021 cropland agreement at 100 m (land-cover products, not field survey). Class 3/4 membership of observed farms is a limitation: the rules use 1-4 km climate and 1:500,000 soil units and are conservative at farm scale; the 10 ha minimum-mapping-unit sieve also removes small cultivated patches."
+ }
+}

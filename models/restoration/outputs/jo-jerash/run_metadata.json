@@ -1,0 +1,512 @@
+{
+ "model_version": "restoration-0.1.0",
+ "region": "jo-jerash",
+ "created": "2026-11-27T16:21:59",
+ "seed": 20261122,
+ "runtime_seconds": 4.0,
+ "checkpoints": {
+  "ece": {
+   "file": "checkpoints/ece_lgbm.txt",
+   "sha256": "0239b4a2c064db35629cfb54af8882f75d8cc0d265f463e09c5577bc3967762b",
+   "features": [
+    "bio1",
+    "bio4",
+    "bio5",
+    "bio6",
+    "bio12",
+    "bio14",
+    "bio15",
+    "bio17",
+    "bio18",
+    "dm_aridity",
+    "elev",
+    "tpi4",
+    "tpi20",
+    "relief4",
+    "sg_ph",
+    "sg_clay",
+    "sg_sand",
+    "sg_soc"
+   ],
+   "trained_on_n": 9402
+  },
+  "esp": {
+   "file": "checkpoints/esp_lgbm.txt",
+   "sha256": "f965557f7ca664ff3a4bbd210425c1fb9ae7a54a0ac2447fc090ea6e8c28106b",
+   "features": [
+    "bio1",
+    "bio4",
+    "bio5",
+    "bio6",
+    "bio12",
+    "bio14",
+    "bio15",
+    "bio17",
+    "bio18",
+    "dm_aridity",
+    "elev",
+    "tpi4",
+    "tpi20",
+    "relief4",
+    "sg_ph",
+    "sg_clay",
+    "sg_sand",
+    "sg_soc"
+   ],
+   "trained_on_n": 8698
+  }
+ },
+ "grid": {
+  "crs": "EPSG:6933",
+  "resolution_m": 250.0,
+  "width": 144,
+  "height": 128
+ },
+ "effective_resolution_m": {
+  "soil_ph_soc_texture": 250,
+  "salinity_sodicity": 1000,
+  "terrain_slope": 30,
+  "climate_water_demand": 4000,
+  "overall": 4000
+ },
+ "current_class_basis": "Model 1 suitability.tif + polygons.geojson",
+ "model1_inputs": "models/suitability/outputs/jo-jerash",
+ "caveats": {
+  "assumed_water_allocation_m3_ha_yr": 8000.0,
+  "feasibility_is_conditional_on_water": true,
+  "water_source_availability_mapped": false,
+  "ui_banner": "Feasibility = technically feasible IF the assumed water allocation is supplied; water source, groundwater and wastewater availability are not mapped. All outcomes are simulated, none observed.",
+  "restoration_outcomes_observed": false,
+  "soil_model_heldout_skill": {
+   "ece": {
+    "target": "log10(ECe dS/m)",
+    "heldout_region": "Levant + Arabian peninsula (lon 30-50, lat 20-38)",
+    "n_heldout": 138,
+    "n_heldout_blocks": 9,
+    "r2_heldout": 0.00950528205903356,
+    "r2_heldout_ci95": [
+     -0.08342793661258412,
+     0.274917310118949
+    ],
+    "rmse_heldout_t": 0.628374882397187,
+    "r2_block_cv": 0.22118173548995856,
+    "conformal_pi90_coverage_cv": 0.9007987910189983,
+    "conformal_pi90_coverage_heldout": 0.8695652173913043,
+    "baseline_global_median_r2_heldout": -0.8996731005137362,
+    "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
+   },
+   "esp": {
+    "target": "log1p(ESP %)",
+    "heldout_region": "Levant + Arabian peninsula (lon 30-50, lat 20-38)",
+    "n_heldout": 74,
+    "n_heldout_blocks": 6,
+    "r2_heldout": 0.008361683689086963,
+    "r2_heldout_ci95": [
+     -0.9943962121179614,
+     0.13010319890494695
+    ],
+    "rmse_heldout_t": 1.0713787261107142,
+    "r2_block_cv": 0.18257216729553682,
+    "conformal_pi90_coverage_cv": 0.9007421150278293,
+    "conformal_pi90_coverage_heldout": 0.9054054054054054,
+    "baseline_global_median_r2_heldout": -1.1318411001663824,
+    "meaning": "weak skill on unseen geography: within-region salinity/sodicity pattern is mostly a regional prior with wide intervals"
+   }
+  },
+  "sensitivity_to_water_allocation": {
+   "baseline (water 8000 m3/ha/yr)": {
+    "mean_score": 0.877,
+    "class_flip_rate": 0.0
+   },
+   "water allocation 3000 m3/ha/yr": {
+    "mean_score": 0.027,
+    "class_flip_rate": 0.995
+   },
+   "water allocation 5000 m3/ha/yr": {
+    "mean_score": 0.506,
+    "class_flip_rate": 0.799
+   },
+   "water allocation 12000 m3/ha/yr": {
+    "mean_score": 0.907,
+    "class_flip_rate": 0.005
+   },
+   "water allocation 20000 m3/ha/yr": {
+    "mean_score": 0.925,
+    "class_flip_rate": 0.006
+   }
+  },
+  "mc_draws": {
+   "raster_outer_param_draws": 16,
+   "raster_inner_input_draws": 4,
+   "raster_draws_per_cell": 64,
+   "raster_cells_evaluated": 4448,
+   "polygon_outer_param_draws": 32,
+   "polygon_inner_input_draws": 6,
+   "polygon_draws_per_polygon": 192,
+   "n_polygons": 207,
+   "seed": 20261122
+  },
+  "evidence_classes": {
+   "observed": [
+    "slope and elevation (Copernicus GLO-30 DEM)",
+    "climate normals and interannual rainfall (TerraClimate 2011-2020, gridded climate product)",
+    "crop/ESP/salinity tolerance tables are literature (see expert_rule)"
+   ],
+   "ml_predicted": [
+    "ECe and ESP (own LightGBM trained on measured WoSIS/Hassani points, conformal intervals)",
+    "pH, SOC, texture, coarse fragments, bulk density, CEC (SoilGrids 2.0, third party)",
+    "depth to bedrock (SoilGrids 2017, third party, capped 200 cm)"
+   ],
+   "expert_rule": [
+    "Maas-Hoffman salinity response (FAO IDP29 Table 4), ESP tolerance classes (FAO SB39), pH/SOC/coarse-fragment/texture/depth/slope response curves (assumed shapes)",
+    "relative erosion index (RUSLE-type structure)",
+    "FAO suitability class boundaries on relative yield (S1>=0.8, S2 0.6-0.8, S3 0.4-0.6 [assumed], N<0.4)"
+   ],
+   "simulated": [
+    "intervention outcomes (leaching, gypsum, organic amendment, terracing, water harvesting)",
+    "post-restoration relative yield, class and water requirement",
+    "feasibility score and interval (Monte-Carlo)"
+   ]
+  },
+  "effective_resolution_m": {
+   "soil_ph_soc_texture": 250,
+   "salinity_sodicity": 1000,
+   "terrain_slope": 30,
+   "climate_water_demand": 4000,
+   "overall": 4000
+  },
+  "grid_resolution_m": 250.0,
+  "climate_window": "TerraClimate 2011-2020 (10 years)",
+  "current_class_source": "Model 1 suitability outputs",
+  "model1_run": {
+   "model_version": "m1-0.1.0",
+   "checkpoint_sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3",
+   "created_at": "2026-11-27T13:21:47Z",
+   "grid_resolution_m": 100.0,
+   "effective_resolution_m": 1000,
+   "confidence_method": "Monte-Carlo agreement: share of 24 draws (SoilGrids/SOTWIS/terrain/climate inputs perturbed by documented error models, ML ensemble member and fusion thresholds resampled) that reproduce the central class. It measures robustness to input uncertainty, NOT validated map accuracy.",
+   "polygons": "models/suitability/outputs/jo-jerash/polygons.geojson"
+  },
+  "soilgrids_arid_rmse": {
+   "ph": 0.34,
+   "soc_pct": 0.55,
+   "sand_pct": 10.8,
+   "clay_pct": 9.2,
+   "note": "SOC has no regional skill (R2~0); depth to bedrock capped at 200 cm and uninformative"
+  }
+ },
+ "model1_run": {
+  "model_version": "m1-0.1.0",
+  "checkpoint_sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3",
+  "created_at": "2026-11-27T13:21:47Z",
+  "grid_resolution_m": 100.0,
+  "effective_resolution_m": 1000,
+  "confidence_method": "Monte-Carlo agreement: share of 24 draws (SoilGrids/SOTWIS/terrain/climate inputs perturbed by documented error models, ML ensemble member and fusion thresholds resampled) that reproduce the central class. It measures robustness to input uncertainty, NOT validated map accuracy.",
+  "polygons": "models/suitability/outputs/jo-jerash/polygons.geojson"
+ },
+ "evidence_breakdown": {
+  "observed": [
+   "slope and elevation (Copernicus GLO-30 DEM)",
+   "climate normals and interannual rainfall (TerraClimate 2011-2020, gridded climate product)",
+   "crop/ESP/salinity tolerance tables are literature (see expert_rule)"
+  ],
+  "ml_predicted": [
+   "ECe and ESP (own LightGBM trained on measured WoSIS/Hassani points, conformal intervals)",
+   "pH, SOC, texture, coarse fragments, bulk density, CEC (SoilGrids 2.0, third party)",
+   "depth to bedrock (SoilGrids 2017, third party, capped 200 cm)"
+  ],
+  "expert_rule": [
+   "Maas-Hoffman salinity response (FAO IDP29 Table 4), ESP tolerance classes (FAO SB39), pH/SOC/coarse-fragment/texture/depth/slope response curves (assumed shapes)",
+   "relative erosion index (RUSLE-type structure)",
+   "FAO suitability class boundaries on relative yield (S1>=0.8, S2 0.6-0.8, S3 0.4-0.6 [assumed], N<0.4)"
+  ],
+  "simulated": [
+   "intervention outcomes (leaching, gypsum, organic amendment, terracing, water harvesting)",
+   "post-restoration relative yield, class and water requirement",
+   "feasibility score and interval (Monte-Carlo)"
+  ]
+ },
+ "label_basis": {
+  "ece": "measured saturated-paste EC (WoSIS ELCOSP + Hassani 2020 points), topsoil 0-30 cm",
+  "esp": "measured exchangeable Na / CEC (Hassani 2020 points)",
+  "restoration_outcomes": "NONE observed: no before/after restoration dataset exists in the sources checked; outcomes are simulated from documented relationships",
+  "feasibility_classes": "Monte-Carlo success probability cut at expert-rule thresholds (0.15/0.40/0.70)"
+ },
+ "scenarios": {
+  "irr_fresh": {
+   "name": "Drip irrigation with fresh groundwater + reclamation leaching, gypsum and organic amendment",
+   "crops": [
+    "barley",
+    "wheat",
+    "alfalfa",
+    "sudan_grass",
+    "tall_wheatgrass",
+    "date_palm",
+    "olive",
+    "almond",
+    "grape",
+    "orange",
+    "tomato"
+   ],
+   "interventions": [
+    "drip_irrigation",
+    "leaching_reclamation",
+    "gypsum_amendment",
+    "organic_amendment",
+    "drainage"
+   ],
+   "water_source": "groundwater_fresh"
+  },
+  "irr_tww": {
+   "name": "Treated-wastewater drip irrigation, salt-tolerant crops, leaching and gypsum",
+   "crops": [
+    "barley",
+    "wheat",
+    "alfalfa",
+    "sudan_grass",
+    "tall_wheatgrass",
+    "date_palm",
+    "olive"
+   ],
+   "interventions": [
+    "drip_irrigation",
+    "leaching_reclamation",
+    "gypsum_amendment",
+    "organic_amendment",
+    "salt_tolerant_crops",
+    "drainage"
+   ],
+   "water_source": "treated_wastewater"
+  },
+  "irr_brackish": {
+   "name": "Brackish-groundwater drip irrigation with salt-tolerant crops (biosaline agriculture)",
+   "crops": [
+    "date_palm",
+    "barley",
+    "tall_wheatgrass",
+    "sudan_grass",
+    "olive"
+   ],
+   "interventions": [
+    "drip_irrigation",
+    "leaching_reclamation",
+    "gypsum_amendment",
+    "salt_tolerant_crops",
+    "drainage"
+   ],
+   "water_source": "groundwater_brackish"
+  },
+  "rainfed_wh": {
+   "name": "Rain-fed cultivation with microcatchment water harvesting and mulch/organic amendment",
+   "crops": [
+    "barley",
+    "olive",
+    "tall_wheatgrass"
+   ],
+   "interventions": [
+    "water_harvesting",
+    "organic_amendment",
+    "salt_tolerant_crops"
+   ],
+   "water_source": "rainwater_harvesting"
+  },
+  "terraced_irr": {
+   "name": "Bench terraces with soil conservation and drip irrigation (sloping land)",
+   "crops": [
+    "barley",
+    "wheat",
+    "alfalfa",
+    "tall_wheatgrass",
+    "date_palm",
+    "olive",
+    "almond",
+    "grape"
+   ],
+   "interventions": [
+    "terracing",
+    "drip_irrigation",
+    "leaching_reclamation",
+    "gypsum_amendment",
+    "organic_amendment",
+    "drainage"
+   ],
+   "water_source": "groundwater_fresh"
+  }
+ },
+ "parameter_priors_sampled": {
+  "tol_f": {
+   "min": 0.6202808547179248,
+   "max": 1.3632411426959972,
+   "mean": 1.0101148938602096
+  },
+  "esp_f": {
+   "min": 0.6958834665775389,
+   "max": 1.6176826568886948,
+   "mean": 0.9798734868796202
+  },
+  "eto_f": {
+   "min": 0.7934097902684392,
+   "max": 1.1643327497070914,
+   "mean": 0.9802784192967077
+  },
+  "kc_f": {
+   "min": 0.9010311504293661,
+   "max": 1.088677100088678,
+   "mean": 1.0025852796826153
+  },
+  "peff": {
+   "min": 0.514896601779543,
+   "max": 0.7879586657389512,
+   "mean": 0.6343491075571216
+  },
+  "eff_drip": {
+   "min": 0.8123752661238614,
+   "max": 0.917052819576039,
+   "mean": 0.8730256377379746
+  },
+  "k_leach": {
+   "min": 1.6446717609579142,
+   "max": 2.2993468433649933,
+   "mean": 1.9662973315857615
+  },
+  "r_cap": {
+   "min": 1.072041510660913,
+   "max": 1.9847863188541819,
+   "mean": 1.5052845513341508
+  },
+  "gyp_eff": {
+   "min": 0.501543550574322,
+   "max": 0.8862167571017758,
+   "mean": 0.7186913989116592
+  },
+  "gyp_cap": {
+   "min": 15.493175601862378,
+   "max": 39.29300352509512,
+   "mean": 26.31366473869052
+  },
+  "dsoc": {
+   "min": 0.07690080506108336,
+   "max": 0.3628006220430312,
+   "mean": 0.1947813172914637
+  },
+  "wcap": {
+   "min": 6150.792559755205,
+   "max": 10718.114741138266,
+   "mean": 8077.8455383995715
+  },
+  "ccr_max": {
+   "min": 6.288966387291334,
+   "max": 11.987649711189519,
+   "mean": 9.317898179454321
+  },
+  "k_runoff": {
+   "min": 0.11894643205154007,
+   "max": 0.4647046693723515,
+   "mean": 0.27694915025363626
+  },
+  "eff_wh": {
+   "min": 0.5017154691268176,
+   "max": 0.7404089605426877,
+   "mean": 0.6183563734142588
+  },
+  "terr_lim": {
+   "min": 20.192982073563968,
+   "max": 29.93149606350663,
+   "mean": 24.602178380497158
+  },
+  "ry_thr": {
+   "min": 0.5599717571881774,
+   "max": 0.6435619338018976,
+   "mean": 0.6086086407564544
+  },
+  "ecw_u": {
+   "min": 0.02910910684804824,
+   "max": 0.9768897950357964,
+   "mean": 0.5011644443726483
+  },
+  "lr_cap": {
+   "min": 0.3614097690677528,
+   "max": 0.4997732244963595,
+   "mean": 0.4372443490249164
+  },
+  "ece_target_yp": {
+   "min": 0.9,
+   "max": 1.0,
+   "mean": 0.934375
+  }
+ },
+ "factor_assumptions": {
+  "RY_sodicity": "piecewise-linear: 1 up to 0.5 E*, 0.5 at E*, 0 at 1.5 E*; E* = ESP above which yields are seriously affected (FAO_SB39 Table 32: 55/35/10; 6 for extremely sensitive = assumed)",
+  "RY_pH": "1 for pH 5.5-8.4; -0.25 RY per pH unit above 8.4; -0.20 per unit below 5.5 (assumed; FAO_SB39 only states pH 8.2 as sodic diagnostic)",
+  "RY_SOC": "0.75 + 0.25 min(SOC/0.6 %, 1) (assumed: dryland soils are productive under fertigation at low SOC)",
+  "RY_coarse_fragments": "1 up to 15 vol %, linear to 0.5 at 55 %, to 0.2 at 80 % (assumed; FAO_SB55 lists stoniness as class-determining factor, limits not read)",
+  "RY_texture": "sand > 85 %: -0.4 per 15 %; clay > 55 %: -0.4 per 45 % (assumed)",
+  "RY_depth": "clip((depth-20 cm)/(Zr_min-20 cm),0,1)^0.6 with Zr_min from FAO56 Table 22 (curve assumed); 0 below 20 cm",
+  "RY_slope": "non-terraced: 1 up to 3 deg, 0.5 at 10 deg, 0 at 18 deg (assumed); terraced: 1 within the terrace limit (20-30 deg, assumed) and depth >= 40 cm",
+  "RY_water": "1 - Ky (1 - supply/demand), Ky = 1 (assumed; FAO-33 Ky not read)",
+  "classes": "S1 >= 0.8, S2 0.6-0.8, S3 0.4-0.6, N < 0.4 relative yield (FAO_SB55: tops of S2 and S3 = 80 % / 60 %; 40 % bound assumed)"
+ },
+ "monte_carlo": {
+  "note": "outer = parameter draws, inner = input-noise draws; feasibility interval over outer draws"
+ },
+ "water_reference_allocation_m3_ha_yr": 8000.0,
+ "source_studies": {
+  "BATJES_2024": {
+   "citation": "Batjes, N.H., Calisto, L. & de Sousa, L.M. (2024). Providing quality-assessed and standardised soil data to support global mapping and modelling (WoSIS snapshot 2023). Earth Syst. Sci. Data 16:4735-4765.",
+   "url": "https://doi.org/10.5194/essd-16-4735-2024",
+   "verification": "abstract"
+  },
+  "FAO56": {
+   "citation": "Allen, R.G., Pereira, L.S., Raes, D. & Smith, M. (1998). Crop evapotranspiration - Guidelines for computing crop water requirements. FAO Irrigation and Drainage Paper 56.",
+   "url": "https://www.fao.org/4/x0490e/x0490e00.htm",
+   "verification": "full_text"
+  },
+  "FAO_IDP29": {
+   "citation": "Ayers, R.S. & Westcot, D.W. (1985). Water quality for agriculture. FAO Irrigation and Drainage Paper 29 Rev. 1.",
+   "url": "https://www.fao.org/4/t0234e/t0234e00.htm",
+   "verification": "full_text"
+  },
+  "FAO_SB39": {
+   "citation": "Abrol, I.P., Yadav, J.S.P. & Massoud, F.I. (1988). Salt-affected soils and their management. FAO Soils Bulletin 39.",
+   "url": "https://www.fao.org/4/x5871e/x5871e00.htm",
+   "verification": "full_text"
+  },
+  "FAO_SB55": {
+   "citation": "FAO (1985). Guidelines: Land evaluation for irrigated agriculture. FAO Soils Bulletin 55.",
+   "url": "https://www.fao.org/3/x5648e/x5648e00.htm",
+   "verification": "full_text"
+  },
+  "FAO_WH91": {
+   "citation": "Critchley, W. & Siegert, K. (1991). A manual for the design and construction of water harvesting schemes for plant production. FAO AGL/MISC/17/91.",
+   "url": "https://www.fao.org/3/u3160e/u3160e00.htm",
+   "verification": "full_text"
+  },
+  "GRAVUER_2019": {
+   "citation": "Gravuer, K., Gennet, S. & Throop, H.L. (2019). Organic amendment additions to rangelands: a meta-analysis of multiple ecosystem outcomes. Global Change Biology 25:1152-1170.",
+   "url": "https://doi.org/10.1111/gcb.14535",
+   "verification": "abstract"
+  },
+  "HASSANI_2020": {
+   "citation": "Hassani, A., Azapagic, A. & Shokri, N. (2020). Predicting long-term dynamics of soil salinity and sodicity on a global scale. PNAS 117(52):33017-33027.",
+   "url": "https://data.mendeley.com/datasets/v9mgbmtnf2/1",
+   "verification": "abstract"
+  },
+  "MAAS_HOFFMAN_1977": {
+   "citation": "Maas, E.V. & Hoffman, G.J. (1977). Crop salt tolerance - current assessment. J. Irrigation and Drainage Div. ASCE 103(IR2):115-134.",
+   "url": "https://doi.org/10.1061/jrcea4.0001137",
+   "verification": "crossref"
+  },
+  "SWATPLUS_K": {
+   "citation": "SWAT+ Input/Output documentation, 'Soil Erodibility Factor' (equations of Williams, J.R. 1995, EPIC).",
+   "url": "https://swatplus.gitbook.io/io-docs/sediment/musle/soil-erodibility-factor",
+   "verification": "full_text"
+  }
+ },
+ "limitations": [
+  "No real restoration outcome data: agreement with rules measures consistency, not real-world success.",
+  "Water SOURCE availability, groundwater depth/quality, aquifer sustainability and treated-wastewater location are not mapped.",
+  "pH/SOC/texture/CF/depth are third-party ML maps with limited arid skill; SOC has no regional skill in the held-out region (R2~0).",
+  "Salinity/sodicity effective resolution ~1 km; climate/water ~4 km; do not read polygon values below that scale as measurements.",
+  "Wind erosion, flash floods, frost and market/economic factors are not modelled."
+ ]
+}

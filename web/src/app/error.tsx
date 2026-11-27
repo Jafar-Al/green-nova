@@ -6,7 +6,7 @@ import { Button, LinkButton } from "@/components/ui/primitives";
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    // Phase C: report to the error tracker. Never log user data.
+    // Hook for an error tracker. Never log user data.
     console.error(error);
   }, [error]);
   return (

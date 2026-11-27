@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_ROOT = Path(os.environ.get("GREEN_NOVA_DATA", r"C:\GreenNovaData"))
+DATA_ROOT = Path(os.environ.get("GREEN_NOVA_DATA") or Path.home() / "GreenNovaData")   # raw data, caches: outside the repo
 RAW = DATA_ROOT / "raw"
 CACHE = DATA_ROOT / "cache"
 COV = CACHE / "covariates"              # shared with model1 (manifest.json lives here)
@@ -52,11 +52,35 @@ M1_CLASS_LABELS = {1: "Currently suitable", 2: "Suitable with limitations", 3: "
 FEAS_CODES = {"not_feasible": 1, "low": 2, "moderate": 3, "high": 4}
 FEAS_LABELS = {v: k for k, v in FEAS_CODES.items()}
 
-REGIONS = {
-    "jo-maan": {"name": "Ma'an", "country": "JO", "adm1": "Ma'an", "iso": "JO-MN",
-                # fallback bbox (lon/lat) of geoBoundaries gbOpen JOR ADM1 Ma'an, used only if the canonical region file is absent
-                "bbox_4326_fallback": (35.301, 29.184, 38.003, 31.274)},
-}
+def _load_registry() -> dict:
+    """Governorates from the canonical boundary file; `bbox_4326_fallback` (lon/lat) is their bounding box."""
+    import json
+
+    def bounds(coords, acc):
+        if coords and isinstance(coords[0], (int, float)):
+            acc[0], acc[1] = min(acc[0], coords[0]), min(acc[1], coords[1])
+            acc[2], acc[3] = max(acc[2], coords[0]), max(acc[3], coords[1])
+        else:
+            for c in coords:
+                bounds(c, acc)
+        return acc
+
+    try:
+        feats = json.loads(REGIONS_GEOJSON.read_text(encoding="utf-8"))["features"]
+    except (FileNotFoundError, KeyError, ValueError):
+        return {"jo-maan": {"name": "Ma'an", "country": "JO", "adm1": "Ma'an", "iso": "JO-MN",
+                            "bbox_4326_fallback": (35.301, 29.184, 38.003, 31.274)}}
+    out = {}
+    for f in feats:
+        p = f.get("properties", {})
+        if p.get("region_id") and f.get("geometry"):
+            bb = bounds(f["geometry"]["coordinates"], [1e9, 1e9, -1e9, -1e9])
+            out[p["region_id"]] = {"name": p.get("name"), "country": p.get("country", "JO"), "adm1": p.get("name"), "iso": p.get("iso"),
+                                   "bbox_4326_fallback": tuple(round(v, 4) for v in bb)}
+    return out
+
+
+REGIONS = _load_registry()
 
 # Feasibility class cut-offs on the Monte-Carlo success probability (expert_rule; sensitivity-tested in eval).
 FEAS_CUTS = {"high": 0.70, "moderate": 0.40, "low": 0.15}

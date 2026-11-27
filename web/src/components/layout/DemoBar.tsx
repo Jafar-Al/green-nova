@@ -3,7 +3,7 @@ import { IS_DEMO_MODE } from "@/lib/config";
 import { DEMO_NOTICE } from "@/lib/demo/notice";
 
 /**
- * Persistent, visible marker on EVERY route while the demo provider is active (docs/ORCHESTRATION.md hard rule).
+ * Persistent, visible marker on EVERY route while the demo provider is active (product rule).
  * Sticky so it can never scroll out of view; not dismissible.
  */
 export function DemoBar() {

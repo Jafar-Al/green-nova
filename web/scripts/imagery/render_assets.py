@@ -5,7 +5,8 @@ Run with the shared venv only:  python -I web/scripts/imagery/render_assets.py <
 Large intermediates stay in <data root>\\cache\\web\\s2 (never in the repo). Only optimised web assets are written under web/public.
 
 Steps
-  select                      choose one low-cloud scene per MGRS tile over Ma'an (narrow date window -> consistent tone)
+  select                      choose one low-cloud scene per MGRS tile over Jordan's 12 governorates (narrow date window -> consistent tone);
+                              set GN_IMAGERY_SET=maan for the original Ma'an-only extent
   mosaic [--zoom 11]          read the 'visual' (true-colour) COG decimated, warp to EPSG:3857, mosaic -> cache/mosaic_z<z>.npy
   tiles  [--zmin 5 --zmax 11] slice the mosaic into an XYZ JPEG pyramid -> web/public/tiles/s2/{z}/{x}/{y}.jpg
   crop --name N --bbox W,S,E,N --res M --widths 2400,1600,800
@@ -37,11 +38,18 @@ from rasterio.windows import from_bounds
 
 ROOT = Path(__file__).resolve().parents[3]  # project root
 WEB_PUBLIC = ROOT / "web" / "public"
-CACHE = Path(os.environ.get("GREEN_NOVA_DATA", str(Path.home() / "GreenNovaData"))) / "cache" / "web" / "s2"
+# Imagery set: "jordan" (default, all 12 governorates) or "maan" (the original Ma'an-only extent).
+IMAGERY_SET = os.environ.get("GN_IMAGERY_SET", "jordan")
+BBOXES = {
+    "maan": (35.2, 29.1, 38.1, 31.35),      # buffered Ma'an extent (governorate bbox 35.30,29.18,38.00,31.27)
+    "jordan": (34.85, 29.1, 39.45, 33.5),   # buffered extent of all 12 governorates (Jordan bbox ~34.9,29.2,39.3,33.4)
+}
+BBOX = BBOXES[IMAGERY_SET]
+_S2_CACHE = Path(os.environ.get("GREEN_NOVA_DATA", str(Path.home() / "GreenNovaData"))) / "cache" / "web" / "s2"
+CACHE = _S2_CACHE if IMAGERY_SET == "maan" else _S2_CACHE / IMAGERY_SET
 CACHE.mkdir(parents=True, exist_ok=True)
 
 STAC = "https://planetarycomputer.microsoft.com/api/stac/v1"
-BBOX = (35.2, 29.1, 38.1, 31.35)  # buffered Ma'an extent (governorate bbox 35.30,29.18,38.00,31.27)
 WINDOW = ("2026-02-25", "2026-03-12")
 FALLBACK = ("2026-02-01", "2026-04-30")
 R = 6378137.0
@@ -190,46 +198,84 @@ def fill(zoom: int, max_extra: int = 14):
     dst_tr = from_origin(left, top, res, res)
     bounds = (left, top - H * res, left + W * res, top)
     adm = json.loads((WEB_PUBLIC / "data" / "jordan_adm1.geojson").read_text())
-    ring = next(f for f in adm["features"] if f["properties"]["shapeName"] == "Ma'an")["geometry"]["coordinates"][0]
-    poly = {"type": "Polygon", "coordinates": [[list(lonlat_to_merc(x, y)) for x, y in ring]]}
-    mask = rasterize([(poly, 1)], out_shape=(H, W), transform=dst_tr).astype(bool)
+    feats = [f for f in adm["features"] if IMAGERY_SET != "maan" or f["properties"]["shapeName"] == "Ma'an"]
+    shapes = []
+    for f in feats:
+        g = f["geometry"]
+        polys = [g["coordinates"]] if g["type"] == "Polygon" else g["coordinates"]
+        for rings in polys:
+            shapes.append(({"type": "Polygon", "coordinates": [[list(lonlat_to_merc(x, y)) for x, y in ring] for ring in rings]}, 1))
+    mask = rasterize(shapes, out_shape=(H, W), transform=dst_tr).astype(bool)
     def hole_share():
         return float(((canvas[0] == 0) & mask).sum()) / float(mask.sum())
-    print(f"holes inside Ma'an before fill: {hole_share()*100:.2f}%")
+    print(f"holes inside the governorate boundaries before fill: {hole_share()*100:.2f}%")
+    from scipy.ndimage import label
+
+    WIDE = ("2025-10-01", "2026-06-30")  # wider than the main window: only used to patch swath-edge gaps
     sel = select()
     used = {v["id"] for v in sel.values()}
     cat = stac()
-    s = cat.search(collections=["sentinel-2-l2a"], bbox=list(BBOX), datetime=f"{FALLBACK[0]}/{FALLBACK[1]}", query={"eo:cloud_cover": {"lt": 15}}, max_items=500)
-    cands = sorted(
-        [it for it in s.items() if it.id not in used],
-        key=lambda it: it.properties["eo:cloud_cover"] + 0.5 * (it.properties.get("s2:nodata_pixel_percentage", 0) or 0),
-    )
-    extras = []
-    for it in cands:
-        if hole_share() < 0.0003 or len(extras) >= max_extra:
+    extras, failed, attempts = [], set(), 0
+
+    def to_lonlat(x, y):
+        return math.degrees(x / R), math.degrees(2 * math.atan(math.exp(y / R)) - math.pi / 2)
+
+    while hole_share() >= 0.0003 and len(extras) < max_extra and attempts < 60:
+        holes = (canvas[0] == 0) & mask
+        lab, n = label(holes[::8, ::8])
+        if n == 0:
             break
-        # only worthwhile if the scene footprint touches a hole
-        got = read_decimated(it.assets["visual"].href, bounds, res * 0.87 * 0.9)
-        if got is None:
-            continue
-        arr, tr, crs = got
-        before = hole_share()
-        for band in range(3):
-            dst = np.zeros((H, W), dtype=np.uint8)
-            reproject(source=arr[band], destination=dst, src_transform=tr, src_crs=crs, dst_transform=dst_tr, dst_crs="EPSG:3857",
-                      resampling=Resampling.bilinear, src_nodata=0, dst_nodata=0)
-            if band == 0:
-                fillm = (canvas[0] == 0) & (dst > 0)
-            canvas[band][fillm] = dst[fillm]
-        gain = before - hole_share()
-        print(f"  {it.id}: holes {before*100:.2f}% -> {hole_share()*100:.2f}%")
-        if gain > 1e-5:
-            extras.append({"id": it.id, "tile": it.properties.get("s2:mgrs_tile"), "datetime": it.datetime.isoformat(), "cloud": it.properties["eo:cloud_cover"],
-                           "nodata_pct": it.properties.get("s2:nodata_pixel_percentage", 0), "baseline": it.properties.get("s2:processing_baseline"), "platform": it.properties.get("platform")})
+        sizes = np.bincount(lab.ravel())[1:]
+        picked = None
+        for i in np.argsort(-sizes):
+            rr, cc = np.where(lab == i + 1)
+            k = int(np.argmin((rr - rr.mean()) ** 2 + (cc - cc.mean()) ** 2))
+            pr, pc = int(rr[k]) * 8 + 4, int(cc[k]) * 8 + 4
+            if sizes[i] > 3 and (pr // 256, pc // 256) not in failed:
+                picked = (pr, pc)
+                break
+        if picked is None:
+            break
+        pr, pc = picked
+        lon, lat = to_lonlat(left + pc * res, top - pr * res)
+        found = list(cat.search(collections=["sentinel-2-l2a"], intersects={"type": "Point", "coordinates": [lon, lat]},
+                                datetime=f"{WIDE[0]}/{WIDE[1]}", query={"eo:cloud_cover": {"lt": 25}}, max_items=60).items())
+        cands = sorted([it for it in found if it.id not in used],
+                       key=lambda it: it.properties["eo:cloud_cover"] + 0.5 * (it.properties.get("s2:nodata_pixel_percentage", 0) or 0))[:8]
+        closed = False
+        for it in cands:
+            attempts += 1
+            try:
+                got = read_decimated(it.assets["visual"].href, bounds, res * 0.87 * 0.9)
+                if got is None:
+                    continue
+                arr, tr, crs = got
+                before = hole_share()
+                for band in range(3):
+                    dst = np.zeros((H, W), dtype=np.uint8)
+                    reproject(source=arr[band], destination=dst, src_transform=tr, src_crs=crs, dst_transform=dst_tr, dst_crs="EPSG:3857",
+                              resampling=Resampling.bilinear, src_nodata=0, dst_nodata=0)
+                    if band == 0:
+                        fillm = (canvas[0] == 0) & (dst > 0)
+                    canvas[band][fillm] = dst[fillm]
+            except Exception as e:  # a scene without usable georeferencing must not abort the run
+                print(f"  skip {it.id}: {type(e).__name__}: {e}")
+                continue
+            used.add(it.id)
+            gain = before - hole_share()
+            print(f"  {it.id}: holes {before*100:.3f}% -> {hole_share()*100:.3f}%")
+            if gain > 1e-6:
+                extras.append({"id": it.id, "tile": it.properties.get("s2:mgrs_tile"), "datetime": it.datetime.isoformat(), "cloud": it.properties["eo:cloud_cover"],
+                               "nodata_pct": it.properties.get("s2:nodata_pixel_percentage", 0), "baseline": it.properties.get("s2:processing_baseline"), "platform": it.properties.get("platform")})
+                closed = True
+                break
+        if not closed:
+            failed.add((pr // 256, pc // 256))
+            print(f"  no scene closed the hole near lon {lon:.3f}, lat {lat:.3f}")
     np.save(CACHE / f"mosaic_z{zoom}.npy", canvas)
     (CACHE / "extra_scenes.json").write_text(json.dumps(extras, indent=1))
     Image.fromarray(np.moveaxis(canvas, 0, -1)).resize((W // 4, H // 4), Image.LANCZOS).save(CACHE / f"preview_z{zoom}.jpg", quality=85)
-    print(f"holes inside Ma'an after fill: {hole_share()*100:.2f}%  (+{len(extras)} scenes)")
+    print(f"holes inside the governorate boundaries after fill: {hole_share()*100:.3f}%  (+{len(extras)} scenes)")
 
 
 def tiles(zmin: int, zmax: int, quality=80):

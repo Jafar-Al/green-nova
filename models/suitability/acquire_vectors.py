@@ -24,7 +24,7 @@ SOT = config.RAW / "sotwis_jo" / "x" / "SOTWIS_JO" / "GIS" / "SOTWIS"
 OSMD = config.RAW / "osm_jordan" / "x"
 STACK = config.M1CACHE / "stack"
 
-SOT_ATTRS = {  # field -> (layer name, unit)  (units per SOTWIS v1.0 / ISRIC Report 2003/04; verified in handoff)
+SOT_ATTRS = {  # field -> (layer name, unit)  (units per SOTWIS v1.0 / ISRIC Report 2003/04; verified, see docs/DATA_SOURCES_model1.md)
     "ELCO": ("sotwis_ec", "dS/m (saturated paste)"), "ESP": ("sotwis_esp", "%"), "GYPS": ("sotwis_gypsum", "g/kg"),
     "TCEQ": ("sotwis_caco3", "g/kg"), "PHAQ": ("sotwis_ph", "pH (H2O)"), "TAWC": ("sotwis_awc", "cm/m"),
     "CFRAG": ("sotwis_cfrag", "vol%"), "CLPC": ("sotwis_clay", "%"), "SDTO": ("sotwis_sand", "%"),

@@ -182,7 +182,7 @@ function SuitabilityInner() {
               </Button>
             }
           >
-            {IS_DEMO_MODE ? "Only the demonstration region has results in this release." : "Only Ma\u2019an has results in this release."} Governorates are added by configuration once their pipelines have run.
+            {IS_DEMO_MODE ? "Only the demonstration region has results in this release." : "Model 1 results for this governorate are not available in this deployment."} Results appear here once the governorate&rsquo;s pipeline outputs are present.
           </EmptyState>
         ) : null}
 

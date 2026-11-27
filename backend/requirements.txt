@@ -1,6 +1,6 @@
 # GREEN NOVA AI backend: FastAPI stack only (CPU). Exact versions that passed backend/tests and the real-model smoke test.
 # The models (models/suitability, models/restoration) have their own heavier dependencies (lightgbm, geopandas, pyproj, ...)
-# and must be installed in the same environment for real analysis; see docs/handoff/model1.md and docs/handoff/model2.md.
+# and must be installed in the same environment for real analysis; see docs/MODEL1_SUITABILITY.md and docs/MODEL2_RESTORATION.md.
 fastapi==0.162.5
 starlette==1.7.0
 uvicorn==0.54.0

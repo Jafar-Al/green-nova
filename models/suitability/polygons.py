@@ -238,7 +238,7 @@ def build_outputs(*, model, rt, sub, sub_mask, win, cls, conf, probs, reason, p_
         raster_files=dict(suitability="uint8, 0=nodata, 1..5 classes (after MMU sieve)", confidence="uint8 0-100, nodata 255",
                           class_probabilities="uint8 percent, 5 bands", suitability_wgs84="EPSG:4326 preview, ~0.001 deg"),
         confidence_method=CONF_METHOD, label_basis=LABEL_BASIS, data_sources=SOURCES,
-        acquisition_date_range=dict(sentinel2="not used by v0.1 checkpoint (see handoff)", dem="2010-2015", worldcover="2020-2021",
+        acquisition_date_range=dict(sentinel2="not used by v0.1 checkpoint (see docs/MODEL1_SUITABILITY.md)", dem="2010-2015", worldcover="2020-2021",
                                     io_lulc="2017-2023", climate="1970-2000 (WorldClim), 2011-2020 (TerraClimate)", osm="2026-11-21"),
         mc_draws=mc_draws, mmu_ha=mmu_cells * config.HA_PER_CELL, polygon_simplify_tolerance_m=50,
         mc_error_model="SoilGrids pH/SOC/sand/clay N(mu,(Q95-Q05)/3.29); other SoilGrids lognormal 0.25; SOTWIS lognormal 0.5; slope lognormal 0.15; rainfall lognormal 0.20; temperature N(0,1 degC)",

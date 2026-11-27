@@ -10,7 +10,7 @@ EX = HERE.parent / "examples" / "run_example.py"
 
 def test_run_example_on_sample_data(tmp_path):
     assert (HERE.parent / "sample_data" / "jo-maan" / "features.npy").stat().st_size < 10 * 1024 * 1024
-    env = {k: v for k, v in os.environ.items() if k != "GREEN_NOVA_RUNTIME"}
+    env = {k: v for k, v in os.environ.items() if k != "GREEN_NOVA_M1_RUNTIME"}
     r = subprocess.run([sys.executable, str(EX), str(tmp_path / "out")], capture_output=True, text=True, env=env, timeout=300)
     assert r.returncode == 0, r.stderr[-2000:]
     assert "CLASS RESULTS" in r.stdout and "mean confidence" in r.stdout and "polygon m1-jo-maan-1" in r.stdout

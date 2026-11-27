@@ -1,7 +1,7 @@
 """Portable CPU example: classify the small sample AOI with the shipped checkpoint (no network, no GPU, no big runtime data).
 
 Usage (from anywhere):  python models/suitability/examples/run_example.py [output_dir]
-It points GREEN_NOVA_RUNTIME at ../sample_data (a 20 km x 20 km feature subset near Shobak, 7.5 MB) and prints the
+It points GREEN_NOVA_M1_RUNTIME at ../sample_data (a 20 km x 20 km feature subset near Shobak, 7.5 MB) and prints the
 class / confidence results for the AOI polygon in ../sample_data/aoi.geojson.
 """
 import json
@@ -12,7 +12,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SAMPLE = HERE.parent / "sample_data"
-os.environ["GREEN_NOVA_RUNTIME"] = str(SAMPLE)          # sample features instead of the 1.13 GB runtime folder
+os.environ["GREEN_NOVA_M1_RUNTIME"] = str(SAMPLE)         # sample features instead of the 1.13 GB runtime folder
 sys.path.insert(0, str(HERE.parents[2]))                # repository root, so `models.suitability` is importable
 
 from models.suitability.infer import run_inference  # noqa: E402

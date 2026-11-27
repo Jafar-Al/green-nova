@@ -37,7 +37,7 @@ function Wait-Job([string]$id) {
 foreach ($p in "/", "/dashboard", "/suitability", "/restoration", "/robots.txt", "/sitemap.xml") {
   Check "page $p" { $s = Get-Status "$Base$p"; Assert ($s -eq 200) "status $s"; "200" }
 }
-Check "Host: greennova.dosteam.org" { $s = Get-Status "$Base/" @{ Host = "greennova.dosteam.org"; "X-Forwarded-Proto" = "https" }; Assert ($s -eq 200) "status $s"; "200" }
+Check "works behind a reverse proxy (other Host header)" { $s = Get-Status "$Base/" @{ Host = "green-nova.example.test"; "X-Forwarded-Proto" = "https" }; Assert ($s -eq 200) "status $s"; "200" }
 Check "live mode: no demo marker in HTML" {
   $h = (Invoke-WebRequest "$Base/dashboard" -UseBasicParsing).Content
   Assert ($h -notmatch "DEMONSTRATION DATA") "demo marker present: the build is still in demo mode"

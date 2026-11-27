@@ -1,6 +1,6 @@
-# Backend design and integration (Phase C, implemented)
+# Backend design and integration
 
-Topology (owner-fixed): browser -> `https://greennova.dosteam.org` (Cloudflare Tunnel, TLS ends there) -> Next.js **0.0.0.0:3000** -> server-side BFF
+Topology: browser -> your TLS-terminating reverse proxy / platform -> Next.js **0.0.0.0:3000** -> server-side BFF
 (`web/src/app/api/gn/[...path]/route.ts`) -> FastAPI **127.0.0.1:8000** (`backend.app.main:app`, ONE uvicorn worker, cwd = `<app root>`).
 Browsers never talk to FastAPI. `BACKEND_URL` is a server-only env var and must be loopback (enforced in code).
 
@@ -42,7 +42,7 @@ Jobs that were queued/running when the process died are marked failed `interrupt
 ## Validation and security
 - region ids `^[a-z]{2}-[a-z0-9]{2,30}$` and must exist; polygon ids `^m1-<region>-<n>$`, deduplicated, <= 500, **matched against the current Model 1 id set** (unknown ids rejected, not guessed); job ids 32-hex; unknown JSON fields rejected; body limit 256 KB (BFF 64 KB).
 - Geometry validators (`validation.validate_geometry/validate_bbox`): Polygon/MultiPolygon only, finite coordinates, <= 5000 vertices, area cap, entirely inside the region bbox. (Ready for a drawn-area endpoint; not exposed yet.)
-- BFF: explicit allowlist table rebuilds each upstream path from validated parts (no pass-through), forwards only `X-GN-Client-IP` (from `CF-Connecting-IP`; the backend honours it only from loopback peers), 90 s timeout, content-type allowlist, loopback-only `BACKEND_URL`.
+- BFF: explicit allowlist table rebuilds each upstream path from validated parts (no pass-through), forwards only `X-GN-Client-IP` (from `CF-Connecting-IP` / `X-Forwarded-For` set by the reverse proxy; the backend honours it only from loopback peers), 90 s timeout, content-type allowlist, loopback-only `BACKEND_URL`.
 - Headers: API sends nosniff, no-store, no-referrer, `default-src 'none'`, CORP same-origin; Next sends CSP (`default-src 'self'`, `worker-src blob:` for MapLibre, `frame-ancestors 'none'`), X-Frame-Options, Referrer-Policy, Permissions-Policy, COOP. TrustedHost allows loopback only. No secrets exist in the client bundle (only `NEXT_PUBLIC_*` non-secrets).
 - Logs: JSON lines `<data root>\runtime\logs\backend.log` (rotating 5 MB x 5): method, route, status, ms, hashed IP; stack traces only in the file; responses and logs pass a path scrubber.
 

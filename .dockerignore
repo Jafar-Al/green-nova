@@ -1,0 +1,15 @@
+.git
+graphify-out
+.venv
+**/node_modules
+**/.next
+**/__pycache__
+**/.pytest_cache
+.env
+.env.*
+!.env.example
+docs
+scripts
+models/*/sample_data
+models/*/examples
+models/*/tests

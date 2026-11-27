@@ -2,7 +2,7 @@
   "name": "green-nova-web",
   "version": "0.1.0",
   "private": true,
-  "description": "GREEN NOVA AI website - Phase A frontend (demonstration data only)",
+  "description": "GREEN NOVA AI web application (Next.js)",
   "engines": {
     "node": ">=20.9.0"
   },

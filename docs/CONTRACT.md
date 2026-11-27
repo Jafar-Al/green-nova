@@ -1,11 +1,11 @@
-# Data contract between Model 1, Model 2 and the website (v0.1 — lead-owned)
+# Data contract between Model 1, Model 2 and the website (v0.1)
 
-Change requests go through the lead. ML agents may ADD optional fields (document them in your handoff); never rename or
+The model code may ADD optional fields (document them in the model docs); never rename or
 remove contract fields. The website must tolerate unknown extra properties.
 
 ## Conventions
-- Region id: `jo-maan` (country `JO`, ADM1 Ma'an). Boundaries: geoBoundaries gbOpen JOR ADM1 (public). Canonical copy:
-  `regions/jordan_adm1.geojson` (model1 owns; web may fetch the same public source for its own demo needs).
+- Region ids: `jo-<governorate>` for all 12 governorates (country `JO`): `jo-ajloun`, `jo-amman`, `jo-aqaba`, `jo-balqa`, `jo-irbid`, `jo-jerash`, `jo-karak`, `jo-maan`, `jo-madaba`, `jo-mafraq`, `jo-tafilah`, `jo-zarqa`.
+  Boundaries: geoBoundaries gbOpen JOR ADM1 (public). Canonical copy: `regions/jordan_adm1.geojson`.
   Pipelines are parameterized by region id so further governorates can be added by config.
 - Vector outputs: GeoJSON, EPSG:4326, RFC 7946, coordinates rounded to ≤6 decimals.
 - Raster outputs: Cloud-Optimized GeoTIFF, native working CRS recorded in `run_metadata.json`; also provide a web-friendly
@@ -60,16 +60,16 @@ provenance: {model_version, evidence_summary, data_sources:[...], source_studies
 Water requirements, intervention effects and post-restoration outcomes are **simulated/expert-derived**, flagged as such, with
 ranges and cited source studies — never presented as observed restoration results.
 
-## Inference interface (each ML agent documents exact signatures in its handoff)
-- CLI: `python -m models.suitability.infer --region jo-maan --out <dir> [--geometry <geojson>] [--device cuda|cpu]` and
-  `python -m models.restoration.infer --region jo-maan --suitability-dir <model1 outputs> --out <dir> [--polygon-ids ...]`.
+## Inference interface (exact signatures are in the model documents)
+- CLI: `python -m models.suitability.infer --region <region-id> --out <dir> [--geometry <geojson>] [--device cuda|cpu]` and
+  `python -m models.restoration.infer --region <region-id> --suitability-dir <model1 outputs> --out <dir> [--polygon-ids ...]`.
 - Python: importable functions that accept a region id and/or GeoJSON geometry, return output file paths + summary dict, accept a
   `progress(fraction, message)` callback, and raise typed exceptions. No network access at inference except documented cached fetches.
 - Region-wide batch may be precomputed; sub-area/polygon queries must be answerable in seconds–minutes from cached covariates.
-- Deterministic given (checkpoint, data vintage, seed). Report runtime and peak RAM/VRAM on this machine.
+- Deterministic given (checkpoint, data vintage, seed). Runtime and peak RAM are reported in the model documents.
 
-## Website data layer (web agent)
-TypeScript types mirror this file exactly (generate from a single `web/src/lib/contract.ts`). Two providers behind one interface:
-`demoProvider` (labelled synthetic) and `apiProvider` (Phase C, real endpoints). Endpoints to be finalized in Phase C from the
-ML handoffs; expected shape: region list, region boundary, start analysis job (+status), polygons GeoJSON, polygon detail, raster
+## Website data layer
+TypeScript types mirror this file exactly (a single `web/src/lib/contract.ts`). Two providers behind one interface:
+`apiProvider` (production: real endpoints through the server-side proxy, see `BACKEND_DESIGN.md`) and `demoProvider` (clearly labelled synthetic data for UI development only, never built into production).
+Endpoints: region list, region boundary, start analysis job (+status), polygons GeoJSON, polygon detail, raster
 tiles/COG URL, export (GeoJSON, GeoTIFF, PDF/CSV report).

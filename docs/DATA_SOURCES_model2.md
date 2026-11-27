@@ -1,6 +1,6 @@
 # Model 2 (restoration potential) - data sources and verification log
 
-Convention: **Used** = enters a trained model, the stack or an evaluation. **Verified** lists only what was actually opened/measured by the model2 agent.
+Convention: **Used** = enters a trained model, the stack or an evaluation. **Verified** lists only what was actually opened/measured.
 Raw data live in `$GREEN_NOVA_DATA/raw/<dataset>` (outside the repository). No credentials, tokens or accounts were created.
 
 ## 0. Headline finding: no before/after restoration dataset
@@ -12,7 +12,7 @@ manufactured as ground truth. Evidence classes: observed / ml_predicted / expert
 - URL: https://www.kaggle.com/competitions/afsis-soil-properties/data . Public data page read (signed-out): `train.csv` 1,158 rows, `test.csv` 728 rows, `sample_submission.csv`; 3 files, 21.7 MB zip;
   targets SOC, pH, Ca (Mehlich-3), P (Mehlich-3), Sand; 3,578 MIR absorbance columns + MODIS/SRTM/TRMM covariates; licence text "Subject to Competition Rules".
 - Data are *monotonically transformed* (negative values, not physical units), covariates are mean-centred/scaled, **no coordinates**, no EC/salinity, depth only topsoil/subsoil; the sampling design excludes true deserts
-  (Sentinel Landscapes across non-desert Africa). Download requires accepting the competition rules: **not accepted** (owner authorisation for AfSIS was later withdrawn by the coordinator).
+  (Sentinel Landscapes across non-desert Africa). Download requires accepting the competition rules: **not accepted** (not needed: the public AWS mirror of the original AfSIS data was used instead).
 - Judgement for Jordan: low value. No MIR spectra exist for Ma'an, sub-Saharan non-desert sites are a large domain shift, targets lack salinity/sodicity. Role: none (blocker recorded, not needed).
 
 ## 2. AfSIS Phase I wet chemistry - public AWS mirror (downloaded, not used in final models)

@@ -1,7 +1,7 @@
 {
- "purpose": "Self-contained runtime inputs for `python -m models.suitability.infer --region jo-maan` (full-region and sub-area queries). Too large for the repository (~1.13 GB); NOT needed for models/suitability/examples/run_example.* (uses sample_data).",
- "location_logical": "<GREEN_NOVA_RUNTIME> (default: <GREEN_NOVA_DATA>/runtime/model1; GREEN_NOVA_DATA names a data folder outside the repository; override the runtime location with env GREEN_NOVA_RUNTIME)",
- "layout": "<GREEN_NOVA_RUNTIME>/jo-maan/{features.npy,meta.json,region_mask.npy} + regions_jordan_adm1.geojson (copy of regions/jordan_adm1.geojson)",
+ "purpose": "Self-contained runtime inputs for `python -m models.suitability.infer --region <region-id>` (full-region and sub-area queries). Shown here for jo-maan (~1.13 GB); every governorate has its own window built by scripts/build_governorate.ps1. Too large for the repository; NOT needed to serve the committed results or for models/suitability/examples/run_example.* (uses sample_data).",
+ "location_logical": "<GREEN_NOVA_M1_RUNTIME> (default: <GREEN_NOVA_DATA>/runtime/model1; GREEN_NOVA_DATA names a data folder outside the repository; override the runtime location with env GREEN_NOVA_M1_RUNTIME)",
+ "layout": "<GREEN_NOVA_M1_RUNTIME>/<region-id>/{features.npy,meta.json,region_mask.npy} + regions_jordan_adm1.geojson (copy of regions/jordan_adm1.geojson)",
  "features_npy": "float32 memmap (47 layers x 2311 rows x 2607 cols) on the 100 m EPSG:6933 grid; layer names in meta.json 'layers'",
  "total_bytes": 1133465335,
  "created_utc": "2026-11-23T04:12:08Z",
@@ -31,9 +31,9 @@
   "file": "models/suitability/checkpoints/model1_suitability_v0.1.pkl (in the repository)",
   "sha256": "c24c5cf0569c9d68a52f617bd44f456c07e4c38e241db1dca299043b721ed8e3"
  },
- "copy_to_new_machine": "Copy the whole folder, set GREEN_NOVA_RUNTIME to it, verify sha256 of each file above.",
+ "copy_to_new_machine": "Copy the whole folder, set GREEN_NOVA_M1_RUNTIME to it, verify sha256 of each file above.",
  "rebuild": {
-  "needs": "the build cache <GREEN_NOVA_DATA>/cache/model1/stack (100 m Jordan layers) which itself needs internet access to Planetary Computer, ISRIC, Geofabrik, ucdavis.edu (hours; see models/suitability/RESUME.md and docs/DATA_SOURCES_model1.md)",
+  "needs": "the build cache <GREEN_NOVA_DATA>/cache/model1/stack (100 m Jordan layers) which itself needs internet access to Planetary Computer, ISRIC, Geofabrik, ucdavis.edu (hours; see docs/DATA_SOURCES_model1.md)",
   "commands": [
    "python -m models.suitability.regions",
    "python -m models.suitability.acquire_static dem soilgrids worldclim gsw  (+ tc_ppt tc_pet tc_tmax tc_tmin tc_def tc_aet in parallel, then: acquire_static terraclimate)",

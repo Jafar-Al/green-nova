@@ -11,7 +11,7 @@ python -m venv .venv
 pip install -r backend/requirements.txt          # FastAPI stack + rasterio/shapely (CPU only)
 pip install -r backend/requirements-dev.txt      # adds pytest/httpx
 ```
-Real analysis additionally needs the models' own dependencies in the same environment (lightgbm, geopandas, pyproj, ...): see `docs/handoff/model1.md` and `docs/handoff/model2.md`.
+Real analysis additionally needs the models' own dependencies in the same environment (lightgbm, geopandas, pyproj, ...): see `docs/MODEL1_SUITABILITY.md` and `docs/MODEL2_RESTORATION.md`.
 
 ## Run (fixed port, loopback only)
 Run from the **app root** = the folder that contains `backend/`, `models/` and `regions/` (the repository root in development):

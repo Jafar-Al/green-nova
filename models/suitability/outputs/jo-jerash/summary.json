@@ -1,0 +1,127 @@
+{
+ "region_id": "jo-jerash",
+ "query": "full_region",
+ "classes": {
+  "1": {
+   "label": "Currently suitable",
+   "polygon_count": 0,
+   "area_ha": 0.0,
+   "area_dunum": 0.0,
+   "share": 0.0
+  },
+  "2": {
+   "label": "Suitable with limitations",
+   "polygon_count": 112,
+   "area_ha": 3565.0,
+   "area_dunum": 35650.0,
+   "share": 0.0958
+  },
+  "3": {
+   "label": "Requires reclamation",
+   "polygon_count": 92,
+   "area_ha": 14409.0,
+   "area_dunum": 144090.0,
+   "share": 0.38719
+  },
+  "4": {
+   "label": "Currently unsuitable",
+   "polygon_count": 57,
+   "area_ha": 13340.0,
+   "area_dunum": 133400.0,
+   "share": 0.35847
+  },
+  "5": {
+   "label": "Excluded (legal/environmental restriction)",
+   "polygon_count": 58,
+   "area_ha": 5900.0,
+   "area_dunum": 59000.0,
+   "share": 0.15854
+  }
+ },
+ "total_area_ha": 37214.0,
+ "total_area_dunum": 372140.0,
+ "area_basis": "cell counts on a 100 m EPSG:6933 equal-area grid (1 cell = 1 ha); 1 dunum = 1,000 m2 = 0.1 ha",
+ "mean_confidence": 0.8593,
+ "agreement_with_observed_cultivation": {
+  "observed_cultivated": {
+   "cells": 340,
+   "area_ha": 340.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 325,
+    "3": 6,
+    "4": 9,
+    "5": 0
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.9559,
+    "3": 0.0176,
+    "4": 0.0265,
+    "5": 0.0
+   }
+  },
+  "observed_not_cultivated": {
+   "cells": 21520,
+   "area_ha": 21520.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 641,
+    "3": 9378,
+    "4": 11501,
+    "5": 0
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.0298,
+    "3": 0.4358,
+    "4": 0.5344,
+    "5": 0.0
+   }
+  },
+  "excluded_or_ambiguous_label": {
+   "cells": 15354,
+   "area_ha": 15354.0,
+   "cells_by_final_class": {
+    "1": 0,
+    "2": 2599,
+    "3": 5025,
+    "4": 1830,
+    "5": 5900
+   },
+   "share_by_final_class": {
+    "1": 0.0,
+    "2": 0.1693,
+    "3": 0.3273,
+    "4": 0.1192,
+    "5": 0.3843
+   }
+  },
+  "observed_cultivated_without_override": {
+   "rule_only_share_by_class": {
+    "1": 0.0,
+    "2": 0.9324,
+    "3": 0.0647,
+    "4": 0.0029
+   },
+   "rules_plus_ml_share_by_class": {
+    "1": 0.0,
+    "2": 0.9324,
+    "3": 0.0647,
+    "4": 0.0029
+   },
+   "note": "classes these cells would get if the observed-cultivation override (class<=2) were switched off; this is the non-circular check"
+  },
+  "mean_ml_cultivation_probability": {
+   "observed_cultivated": 0.6977,
+   "observed_not_cultivated_sample": 0.0171,
+   "median_observed_cultivated": 0.7684,
+   "median_observed_not_cultivated_sample": 0.0033,
+   "n_cultivated": 340,
+   "n_not_cultivated_sample": 21520,
+   "note": "in-sample for Jordan-wide training (Ma'an cells were in the final training set); the leave-governorate-out numbers are the held-out evidence"
+  },
+  "note_on_circularity": "The delivered map caps observed-cultivated cells at class 2 BY DESIGN (observed override), so the high class-2 share of observed_cultivated is partly by construction; see observed_cultivated_without_override for the rule/ML-only view.",
+  "reading": "95.6% of observed-cultivated cells fall in classes 1-2, 4.4% in classes 3-4, 0.0% in class 5. Labels: WorldCover-2021 AND IO-LULC-2021 cropland agreement at 100 m (land-cover products, not field survey). Class 3/4 membership of observed farms is a limitation: the rules use 1-4 km climate and 1:500,000 soil units and are conservative at farm scale; the 10 ha minimum-mapping-unit sieve also removes small cultivated patches."
+ }
+}

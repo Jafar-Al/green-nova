@@ -1,7 +1,7 @@
 """Light validators for docs/CONTRACT.md feature properties (mirror of web/src/lib/contract.ts guards).
 
 Model output is validated before it is served: a feature that does not match the contract is dropped and COUNTED (never repaired, never invented).
-Unknown extra properties are tolerated (ML agents may add optional fields).
+Unknown extra properties are tolerated (the model code may add optional fields).
 """
 from __future__ import annotations
 

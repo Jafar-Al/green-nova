@@ -95,7 +95,7 @@ function Cell({ items }: { items: string[] }) {
   );
 }
 
-/** Scenario comparison for one unit: columns are scenarios, rows are the quantities the owner asked to compare. */
+/** Scenario comparison for one unit: columns are scenarios, rows are the quantities to compare. */
 export function ScenarioCompare({ ev, interventions }: { ev: PolygonEvaluation; interventions: RestorationFeature["properties"]["interventions"] }) {
   const scs = ev.scenarios;
   if (scs.length === 0) {

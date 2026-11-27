@@ -1,4 +1,4 @@
-# GREEN NOVA AI design system (web, Phase A)
+# GREEN NOVA AI design system (web)
 
 Source of truth for tokens: `web/src/app/globals.css` (CSS variables + Tailwind v4 `@theme`). Colour contrast of every role pair is
 verified by `web/src/lib/__tests__/contrast.test.ts` (parses the CSS, fails the build on regression).

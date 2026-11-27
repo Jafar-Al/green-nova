@@ -38,7 +38,7 @@ export function RegionSelectors({
         </span>
       </div>
       <div>
-        <FieldLabel htmlFor={`${idPrefix}-region`} hint={IS_DEMO_MODE ? "Governorate (ADM1). Ma’an is the demonstration region." : "Governorate (ADM1). Ma’an is the first analysed region."}>
+        <FieldLabel htmlFor={`${idPrefix}-region`} hint={IS_DEMO_MODE ? "Governorate (ADM1). Ma’an is the demonstration region." : "Governorate (ADM1). All 12 governorates of Jordan are analysed."}>
           Governorate
         </FieldLabel>
         <select id={`${idPrefix}-region`} className="field" value={regionId} onChange={(e) => onRegion(e.target.value)} disabled={loading && regions.length === 0}>

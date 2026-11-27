@@ -1,0 +1,26 @@
+# docker compose up --build   ->  http://localhost:3000
+# The web container joins the backend container's network namespace, so the backend stays on 127.0.0.1:8000 (never published)
+# and the web server's loopback-only BACKEND_URL rule is satisfied. Only port 3000 is published (declared on the backend service
+# because the two containers share one network stack).
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - green-nova-data:/data
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    network_mode: "service:backend"
+    depends_on:
+      - backend
+    restart: unless-stopped
+volumes:
+  green-nova-data:

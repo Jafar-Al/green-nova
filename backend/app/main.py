@@ -102,8 +102,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             problems.append("region boundaries")
         models = {}
         for r in regs:
-            if r in ("jo-maan",):
-                models[r] = {"suitability": st.suit.status(r), "restoration": st.rest.status(r)}
+            models[r] = {"suitability": st.suit.status(r), "restoration": st.rest.status(r)}
         # 503 only when core infrastructure is broken; a missing model is reported (degraded) and served as 503 per endpoint
         degraded = any(not m[k]["available"] for m in models.values() for k in m)
         body = {"status": "unavailable" if problems else ("degraded" if degraded else "ready"), "problems": problems, "models": models, "queue": {"depth": st.jobs.queue_depth(), "running": bool(st.jobs.current)}}
