@@ -192,6 +192,22 @@ export interface ClimateBlock {
   [extra: string]: unknown;
 }
 
+export interface RestorationWater {
+  /** Renewable water generated at the unit (climatic surplus P - AET, ~4 km), m3/ha/yr, with its year-to-year spread. */
+  local_renewable_supply_m3_ha_yr: { central: number; year_to_year_sd: number } | null;
+  /** The cheapest irrigated route compared with the local supply (null when no irrigated scenario has a finite water figure). */
+  irrigation: {
+    scenario: string;
+    central_requirement_m3_ha_yr: number;
+    local_renewable_supply_m3_ha_yr: number;
+    deficit_m3_ha_yr: number;
+    surplus_m3_ha_yr: number;
+    share_of_need_met_locally: number;
+  } | null;
+  basis?: string;
+  not_mapped?: string;
+}
+
 export interface RestorationProvenance {
   model_version: string;
   evidence_summary: string | Record<string, unknown>;
@@ -211,6 +227,8 @@ export interface RestorationProperties {
   feasibility: Feasibility;
   interventions: Intervention[];
   scenarios: RestorationScenario[];
+  /** Water needed vs available locally; absent in older outputs and in demonstration data. */
+  water?: RestorationWater;
   soil: SoilBlock;
   terrain: TerrainBlock;
   climate: ClimateBlock;

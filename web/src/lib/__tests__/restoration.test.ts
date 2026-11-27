@@ -24,6 +24,11 @@ describe("restoration constraints", () => {
     expect(s).toEqual([...s].sort((a, b) => a.localeCompare(b)));
   });
 
+  it("does not crash on the slim region-wide layer, whose units carry no scenarios", () => {
+    const slim = features.map((f) => ({ ...f, properties: { ...f.properties, scenarios: undefined } })) as unknown as typeof features;
+    expect(availableWaterSources(slim)).toEqual([]);
+  });
+
   it("scenarioKey is the tier suffix", () => {
     const sc = features.find((f) => f.properties.scenarios.length)!.properties.scenarios[0]!;
     expect(["conservative", "standard", "intensive"]).toContain(scenarioKey(sc));

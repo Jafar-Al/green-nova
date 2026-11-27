@@ -24,7 +24,8 @@ export const DEFAULT_CONSTRAINTS: RestorationConstraints = {
 /** Every distinct water source named by any scenario, sorted. */
 export function availableWaterSources(features: RestorationFeature[]): string[] {
   const set = new Set<string>();
-  for (const f of features) for (const s of f.properties.scenarios) for (const w of s.water_sources) set.add(w);
+  // the region-wide layer served by the API is slim and has no scenarios; only analysed units carry them
+  for (const f of features) for (const s of f.properties.scenarios ?? []) for (const w of s.water_sources) set.add(w);
   return [...set].sort((a, b) => a.localeCompare(b));
 }
 

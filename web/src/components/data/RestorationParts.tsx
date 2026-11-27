@@ -96,7 +96,50 @@ function Cell({ items }: { items: string[] }) {
 }
 
 /** Scenario comparison for one unit: columns are scenarios, rows are the quantities to compare. */
-export function ScenarioCompare({ ev, interventions }: { ev: PolygonEvaluation; interventions: RestorationFeature["properties"]["interventions"] }) {
+/** Water needed versus the renewable water generated locally, for every analysed unit (also those with no viable scenario). */
+function WaterBalance({ water }: { water: RestorationFeature["properties"]["water"] }) {
+  const sup = water?.local_renewable_supply_m3_ha_yr;
+  if (!sup) return null;
+  const irr = water?.irrigation;
+  return (
+    <div className="rounded-sm border border-line p-3 text-xs text-ink-2">
+      <p className="m-0 mb-1 font-semibold text-ink">Water: needed vs available locally</p>
+      <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 tnum">
+        <dt>Local renewable water</dt>
+        <dd className="m-0 text-ink">
+          {fmtNum(sup.central, 0)} m³/ha/yr <span className="text-ink-3">(year to year ±{fmtNum(sup.year_to_year_sd, 0)})</span>
+        </dd>
+        {irr && (
+          <>
+            <dt>Irrigation need, cheapest irrigated route</dt>
+            <dd className="m-0 text-ink">{fmtNum(irr.central_requirement_m3_ha_yr, 0)} m³/ha/yr</dd>
+            <dt>{irr.deficit_m3_ha_yr > 0 ? "Deficit" : "Surplus"}</dt>
+            <dd className="m-0 text-ink">{fmtNum(irr.deficit_m3_ha_yr > 0 ? irr.deficit_m3_ha_yr : irr.surplus_m3_ha_yr, 0)} m³/ha/yr</dd>
+          </>
+        )}
+      </dl>
+      <p className="m-0 mt-1.5 text-ink-3">
+        {irr
+          ? irr.deficit_m3_ha_yr > 0
+            ? `Local water covers ${fmtNum(100 * irr.share_of_need_met_locally, 0)}% of the irrigation need; the rest would have to come from sources not mapped here (groundwater limits, fossil aquifers, transfers, treated wastewater).`
+            : "Local renewable water covers the irrigation need of this route."
+          : "No irrigated route has a finite water figure for this unit."}{" "}
+        Climatic surplus at about 4 km is an upper bound, not a measured water balance.
+      </p>
+    </div>
+  );
+}
+
+export function ScenarioCompare(props: { ev: PolygonEvaluation; interventions: RestorationFeature["properties"]["interventions"] }) {
+  return (
+    <div className="grid gap-3">
+      <WaterBalance water={props.ev.feature.properties.water} />
+      <ScenarioTable {...props} />
+    </div>
+  );
+}
+
+function ScenarioTable({ ev, interventions }: { ev: PolygonEvaluation; interventions: RestorationFeature["properties"]["interventions"] }) {
   const scs = ev.scenarios;
   if (scs.length === 0) {
     return (
@@ -153,7 +196,15 @@ export function ScenarioCompare({ ev, interventions }: { ev: PolygonEvaluation; 
                 return (
                   <td key={s.scenario.id} className="text-xs text-ink-2 tnum">
                     {sup == null ? "—" : `${fmtNum(sup, 0)} m³/ha/yr`}
-                    <span className="mt-1 block text-ink-3">{sup == null ? "" : def > 0 ? `Deficit ${fmtNum(def, 0)} m³/ha/yr must come from sources not mapped here` : "Need is within local supply"}</span>
+                    <span className="mt-1 block text-ink-3">
+                      {sup == null
+                        ? ""
+                        : s.scenario.water_requirement_m3_ha_yr.central === 0
+                          ? "Rain-fed: no irrigation water needed"
+                          : def > 0
+                            ? `Deficit ${fmtNum(def, 0)} m³/ha/yr must come from sources not mapped here`
+                            : "Need is within local supply"}
+                    </span>
                   </td>
                 );
               })}
@@ -382,6 +433,6 @@ export function ConstraintsForm({
 
 export function tiersFrom(features: RestorationFeature[]): { key: string; label: string }[] {
   const seen = new Map<string, string>();
-  for (const f of features) for (const s of f.properties.scenarios) if (!seen.has(scenarioKey(s))) seen.set(scenarioKey(s), s.name.split(":")[0] ?? s.name);
+  for (const f of features) for (const s of f.properties.scenarios ?? []) if (!seen.has(scenarioKey(s))) seen.set(scenarioKey(s), s.name.split(":")[0] ?? s.name);
   return [...seen.entries()].map(([key, label]) => ({ key, label }));
 }

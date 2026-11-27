@@ -61,12 +61,6 @@ function RestorationInner() {
   const regionInfo = list.data?.regions.find((r) => r.id === regionId);
   const regionName = regionInfo?.name.replace("'", "’") ?? regionId;
 
-  const sources = useMemo(() => availableWaterSources(data?.restoration?.features ?? []), [data?.restoration]);
-  // until the user edits the form, every water source named by the data is available
-  const effectiveConstraints = useMemo<RestorationConstraints>(
-    () => (touched ? constraints : { ...constraints, allowed_water_sources: sources }),
-    [touched, constraints, sources],
-  );
   const setC = (c: RestorationConstraints) => {
     setTouched(true);
     setConstraints(c);
@@ -89,6 +83,15 @@ function RestorationInner() {
   const run = runMatches ? runState!.run : null;
   const runError = runMatches ? runState!.error : null;
 
+  // The region-wide layer is slim (no scenarios); water sources and scenario tiers come from the analysed units once a run has completed.
+  const scenarioFeatures = useMemo(() => run?.features ?? data?.restoration?.features ?? [], [run, data?.restoration]);
+  const sources = useMemo(() => availableWaterSources(scenarioFeatures), [scenarioFeatures]);
+  // until the user edits the form, every water source named by the data is available
+  const effectiveConstraints = useMemo<RestorationConstraints>(
+    () => (touched ? constraints : { ...constraints, allowed_water_sources: sources }),
+    [touched, constraints, sources],
+  );
+
   const m1ById = useMemo(() => new Map((polygons?.features ?? []).map((f) => [f.properties.id, f] as const)), [polygons]);
   const classCount = useMemo(() => {
     const c: Record<number, number> = {};
@@ -99,7 +102,7 @@ function RestorationInner() {
 
   const evals = useMemo(() => (run ? evaluateRun(run.features, effectiveConstraints) : []), [run, effectiveConstraints]);
   const outcome = useMemo(() => summariseOutcome(evals, preference), [evals, preference]);
-  const tiers = useMemo(() => tiersFrom(data?.restoration?.features ?? []), [data?.restoration]);
+  const tiers = useMemo(() => tiersFrom(scenarioFeatures), [scenarioFeatures]);
 
   const analysedIds = useMemo(() => new Set(run?.features.map((f) => f.properties.source_polygon_id) ?? []), [run]);
   const postClass = useMemo(() => {
